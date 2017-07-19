@@ -1,14 +1,14 @@
 {
   "name": "bedita-sdk-js",
-  "version": "4.0.0-alpha.1",
+  "version": "4.0.0-alpha.2",
   "description": "BEdita SDK for JavaScript.",
   "main": "src/index.js",
   "scripts": {
     "build": "rollup src/index.js --config --output dist/bedita-sdk.js"
   },
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/bedita/bedita-sdk-js.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bedita/bedita-sdk-js.git"
   },
   "keywords": [
     "bedita",
@@ -16,9 +16,9 @@
     "api"
   ],
   "author": "BEdita <info@bedita.com> (http://www.bedita.com)",
-  "license": "LGPL",
+  "license": "LGPL-3.0",
   "dependencies": {
-    "@chialab/synapse": "github:chialab/synapse#670e80a"
+    "@chialab/synapse": "github:chialab/synapse#1.1.0"
   },
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",
