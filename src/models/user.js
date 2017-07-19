@@ -11,6 +11,24 @@ const SCHEMA = {
             properties: {
                 username: { type: 'string', maximum: 255 },
                 password_hash: { type: 'string', maximum: 255 },
+                phone: {
+                    oneOf: [
+                        { type: 'null' },
+                        { type: 'string',  maximum: 255 },
+                    ],
+                },
+                company_name: {
+                    oneOf: [
+                        { type: 'null' },
+                        { type: 'string',  maximum: 255 },
+                    ],
+                },
+                company_kind: {
+                    oneOf: [
+                        { type: 'null' },
+                        { type: 'string',  maximum: 255 },
+                    ],
+                },
                 metadata: {
                     allOf: [
                         { $ref: '#/definitions/metadata' },

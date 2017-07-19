@@ -9,7 +9,7 @@ tv4.addFormat('date-time', (data) => {
     if ((data instanceof Date) && !isNaN(data.getTime())) {
         return null;
     }
-    return "Invalid date";
+    return 'Invalid date';
 });
 
 const SCHEMA = {
@@ -17,6 +17,16 @@ const SCHEMA = {
         metadata: {
             type: 'object',
             additionalProperties: true,
+            properties: {
+                created: {
+                    type: 'string',
+                    format: 'date-time',
+                },
+                modified: {
+                    type: 'string',
+                    format: 'date-time',
+                },
+            },
         },
     },
 };
@@ -31,7 +41,7 @@ export class Model extends AjaxModel {
         return class extends Ctr {
             static get schema() { return schema; }
             get type() { return type; }
-        }
+        };
     }
 
     isNew() {

@@ -14,6 +14,7 @@ export class Api extends Factory {
 
     config(options = {}) {
         this.options = options;
+        this.restore();
     }
 
     restore() {
@@ -57,21 +58,19 @@ export class Api extends Factory {
                 options.headers['content-type'] = 'application/x-www-form-urlencoded';
             }
         }
-        console.log('BEDITA', (options.method || 'GET').toUpperCase(), url);
-        
         return fetch(url, options)
-            .then((res) => {
-                if (res.statusText.toLowerCase() !== 'no content') {
-                    return res.json()
-                        .then((json) => {
-                            if (res.ok) {
-                                return Promise.resolve(json);
-                            }
-                            return Promise.reject(json);
-                        });
-                }
-                return Promise.resolve();
-            })
+            .then((res) =>
+                res.text()
+                    .then((json) => {
+                        if (json) {
+                            json = JSON.parse(json);
+                        }
+                        if (res.ok) {
+                            return Promise.resolve(json);
+                        }
+                        return Promise.reject(json);
+                    })
+            )
             .catch((res) => {
                 if (this.token && res && res.error && res.error.status == 401 && res.error.title === 'Expired token') {
                     return this.renew()
@@ -82,28 +81,28 @@ export class Api extends Factory {
             });
     }
 
+    queue(fn) {
+        queue = queue
+            .catch(() => Promise.resolve())
+            .then(() => fn());
+    }
+
     get(api, options) {
-        queue = queue.catch(() => Promise.resolve())
-            .then(() => this.request(api, options));
-        return queue;
+        return this.queue(() => this.request(api, options));
     }
 
     post(api, data, options) {
         options = options ? SchemaModel.clone(options) : {};
         options.body = data;
         options.method = 'POST';
-        queue = queue.catch(() => Promise.resolve())
-            .then(() => this.request(api, options));
-        return queue;
+        return this.queue(() => this.request(api, options));
     }
 
     patch(api, data, options) {
         options = options ? SchemaModel.clone(options) : {};
         options.body = data;
         options.method = 'PATCH';
-        queue = queue.catch(() => Promise.resolve())
-            .then(() => this.request(api, options));
-        return queue;
+        return this.queue(() => this.request(api, options));
     }
 
     delete(api, data, options) {
@@ -112,9 +111,7 @@ export class Api extends Factory {
         options.method = 'DELETE';
         options.headers = options.headers || {};
         options.headers['content-type'] = 'application/vnd.api+json';
-        queue = queue.catch(() => Promise.resolve())
-            .then(() => this.request(api, options));
-        return queue;
+        return this.queue(() => this.request(api, options));
     }
 
     unsetAccessToken() {
@@ -159,7 +156,7 @@ export class Api extends Factory {
         }
         let token = this.token;
         this.token = this.renewToken;
-        return this.request('auth', { method: 'POST' })
+        return this.post('auth')
             .then((res) => {
                 this.onAuth(res);
                 return Promise.resolve(res);

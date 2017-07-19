@@ -32,10 +32,13 @@ export class Collection extends AjaxCollection {
     }
 
     execFetch(options = {}) {
-        return this.factory('api').get(options.endpoint, options);
+        options = Collection.clone(options);
+        options.method = options.method || 'get';
+        return this.factory('api').request(options.endpoint, options);
     }
 
     fetch(model, options = {}) {
+        options = Collection.clone(options);
         let api = options.endpoint;
         let id = model.get('id');
         if (!api && id) {
@@ -63,7 +66,7 @@ export class Collection extends AjaxCollection {
                 let included = this.included;
                 let promises = [];
                 if (included.length) {
-                    models.forEach((model, index) => {
+                    models.forEach((model) => {
                         let rels = model.getRelationships();
                         for (let k in rels) {
                             let rel = rels[k];
@@ -74,7 +77,7 @@ export class Collection extends AjaxCollection {
                                 if (objData) {
                                     promises.push(
                                         relModel.setFromResponse(Model.clone(objData))
-                                    )
+                                    );
                                 }
                             });
                         }
@@ -88,6 +91,7 @@ export class Collection extends AjaxCollection {
     }
 
     execPost(options = {}) {
+        options = Collection.clone(options);
         options.method = options.method || 'post';
         options.method = options.method.toLowerCase();
         return this.factory('api')[options.method](
@@ -98,6 +102,7 @@ export class Collection extends AjaxCollection {
     }
 
     post(model, options = {}) {
+        options = Collection.clone(options);
         let api = options.endpoint;
         if (!api) {
             let id = model.get('id');
@@ -127,7 +132,7 @@ export class Collection extends AjaxCollection {
     }
 
     findAll(options = {}) {
-        options = Model.clone(options);
+        options = Collection.clone(options);
         let Entity = options.Model || this.constructor.Model;
         let endpoint = options.endpoint || this.endpoint || Entity.prototype.type;
         if (!endpoint) {
@@ -173,13 +178,37 @@ export class Collection extends AjaxCollection {
         endpoint = url.setSearchParams(endpoint, queryParams);
         this.endpoint = options.endpoint = endpoint;
         internal(this).lastOptions = options;
-        return super.findAll(options);
+
+        let promise = super.findAll(options);
+        if (options.full) {
+            // Load all results by fetching all pages one after the other.
+            let currentPage = options.page || 1;
+            promise = promise.then((res) => {
+                if (!this.pagination || this.pagination.page_count <= currentPage) {
+                    return Promise.resolve(res);
+                }
+
+                return this.getCleanCopy().then((collection) => {
+                    options.page = currentPage + 1;
+                    return collection.findAll(options).then(() =>
+                        this.joinCollection(collection)
+                    );
+                });
+            });
+        }
+
+        return promise;
+    }
+
+    getQueryParam(param) {
+        let options = internal(this).lastOptions || {};
+        return options[param];
     }
 
     isSortBy(field) {
         let endpoint = this.endpoint;
         if (endpoint) {
-            let sort = this.factory('search').getSearchParam(endpoint, 'sort');
+            let sort = this.factory('url').getSearchParam(endpoint, 'sort');
             if (sort) {
                 return sort === field || sort === `-${field}`;
             }
@@ -190,7 +219,7 @@ export class Collection extends AjaxCollection {
     sortType() {
         let endpoint = this.endpoint;
         if (endpoint) {
-            let sort = this.factory('search').getSearchParam(endpoint, 'sort');
+            let sort = this.factory('url').getSearchParam(endpoint, 'sort');
             if (sort) {
                 return sort[0] !== '-' ? 'asc' : 'desc';
             }
@@ -205,6 +234,7 @@ export class Collection extends AjaxCollection {
     }
 
     delete(model, options = {}) {
+        options = Collection.clone(options);
         let api = options.endpoint;
         if (!api) {
             let id = model.get('id');
@@ -218,6 +248,9 @@ export class Collection extends AjaxCollection {
         return this.beforeFetch(options)
             .then((options) =>
                 this.factory('api').delete(api, undefined, options)
+                    .then((res) =>
+                        this.afterFetch(res)
+                    )
                     .then(() => {
                         model.delete();
                         return model.destroy();
@@ -226,13 +259,29 @@ export class Collection extends AjaxCollection {
     }
 
     getMinimalPropertiesSet() {
-        let type = this.type;
-        if (!type) {
-            let firstModel = this.get(0);
-            if (firstModel) {
-                type = firstModel.type;
-            }
-        }
         return ['id', 'uname', 'title', 'metadata.created', 'metadata.modified'];
+    }
+
+    /**
+     * Merge two collections.
+     *
+     * @param {Collection} collection Collection to be joined into the current one.
+     * @return {Promise}
+     */
+    joinCollection(collection) {
+        return Promise.all(collection.map((model) => this.add(model)));
+    }
+
+    /**
+     * Get a clean copy of the current collection model.
+     *
+     * @return {Promise<Collection>}
+     */
+    getCleanCopy() {
+        return this.initClass(this.constructor);
+    }
+
+    update() {
+        return Promise.resolve();
     }
 }

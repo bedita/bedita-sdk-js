@@ -1,10 +1,27 @@
 import { Factory } from '@chialab/synapse/src/factory.js';
 
 export class Registry extends Factory {
+    static get models() {
+        return [];
+    }
+
+    static get collections() {
+        return [];
+    }
+
     initialize(...args) {
         this.models = {};
         this.collections = {};
-        return super.initialize(...args);
+        return super.initialize(...args)
+            .then(() => {
+                (this.constructor.collections || []).forEach((Collection) => {
+                    this.registerCollection(Collection);
+                });
+                (this.constructor.models || []).forEach((Model) => {
+                    this.registerModel(Model);
+                });
+                return Promise.resolve(this);
+            });
     }
 
     registerModel(Model) {

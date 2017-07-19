@@ -2,11 +2,15 @@ import { mix } from '@chialab/synapse/src/helpers/mixin.js';
 import { Factory } from '@chialab/synapse/src/factory.js';
 import { InjectableMixin } from '@chialab/synapse/src/mixins/injectable.js';
 
+// MODELS
 export * from './model.js';
+export * from './models/date_range.js';
 export * from './models/role.js';
 export * from './models/type.js';
 export * from './models/object.js';
 export * from './models/user.js';
+
+// COLLECTIONS
 export * from './collection.js';
 export * from './collections/relationships.js';
 export * from './collections/types.js';
@@ -24,9 +28,9 @@ export { Registry };
 export class Client extends mix(Factory).with(InjectableMixin) {
     static get injectors() {
         return {
-            'url': Url,
-            'api': Api,
-            'registry': Registry,
+            url: Url,
+            api: Api,
+            registry: Registry,
         };
     }
 

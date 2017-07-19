@@ -6,9 +6,10 @@ const REL_META_KEY = 'relationshipsMeta';
 
 export class BaseModel extends Model {
     initialize(...args) {
+        let ctrRelationships = Object.keys(this.constructor.relationships || {});
         return super.initialize(...args)
             .then(() =>
-                this.setupRelationships()
+                this.setupRelationships(ctrRelationships)
             );
     }
 
@@ -16,31 +17,51 @@ export class BaseModel extends Model {
         return super.merge(model)
             .then(() => {
                 let rels = model.getRelationships() || {};
-                return this.setupRelationships(rels);
+                let keys = Object.keys(rels);
+                return this.setupRelationships(keys)
+                    .then(() => {
+                        keys.forEach((name) => {
+                            let collection = this.getRelationship(name);
+                            collection.reset();
+                            let parentCollection = model.getRelationship(name);
+                            parentCollection.forEach((relModel) => {
+                                this.addRelationship(
+                                    name,
+                                    relModel,
+                                    model.getRelationshipMeta(name, relModel)
+                                );
+                            });
+                            collection.resetChanges();
+                        });
+                        return Promise.resolve(this);
+                    });
             });
     }
 
-    reset(skip) {
+    reset(skipChanges) {
         let rels = this.getRelationships() || {};
         Object.keys(rels).forEach((name) => {
-            rels[name].reset(skip);
+            rels[name].reset(skipChanges);
         });
         this.set(REL_META_KEY, undefined, { internal: true });
-        return super.reset(skip);
+        return super.reset(skipChanges);
     }
 
     setFromResponse(res) {
         if (res) {
             let relPromise = Promise.resolve();
             if (res.relationships) {
-                relPromise = this.setupRelationships(res.relationships);
+                relPromise = this.setupRelationships(Object.keys(res.relationships));
                 delete res.relationships;
             }
             return relPromise.then(() =>
-                super.setFromResponse(res).then((lastRes) => {
-                    this.trigger('synced');
-                    return Promise.resolve(lastRes);
-                })
+                super.setFromResponse(res)
+                    .then((lastRes) =>
+                        this.trigger('synced')
+                            .then(() =>
+                                Promise.resolve(lastRes)
+                        )
+                    )
             );
         }
         return super.setFromResponse(res);
@@ -70,9 +91,13 @@ export class BaseModel extends Model {
                 return true;
             })
             .forEach((relName) => {
-                promise = promise.then(() => this.fetchRelationship(relName));
+                promise = promise.then(() => this.fetchRelationship(relName, options));
             });
-        return promise.then(() => Promise.resolve(this));
+        return promise
+            .then(() => {
+                this.trigger('change', {});
+                return Promise.resolve(this);
+            });
     }
 
     postRelationships() {
@@ -99,17 +124,10 @@ export class BaseModel extends Model {
         });
     }
 
-    setupRelationships(rels = {}) {
-        let ctrRels = this.constructor.relationships || {};
+    setupRelationships(rels = []) {
         let collections = this.getRelationships() || {};
-        let keys = Object.keys(rels);
-        Object.keys(ctrRels).forEach((ctrRel) => {
-            if (keys.indexOf(ctrRel) === -1) {
-                keys.push(ctrRel);
-            }
-        });
         return Promise.all(
-            keys.map((name) => {
+            rels.map((name) => {
                 if (!collections.hasOwnProperty(name)) {
                     return this.initClass(RelationshipsCollection, name, this)
                         .then((collection) => {
@@ -121,25 +139,7 @@ export class BaseModel extends Model {
             })
         ).then(() => {
             this.setRelationships(collections);
-            for (let k in ctrRels) {
-                if (ctrRels[k].alias) {
-                    this.set(ctrRels[k].alias, collections[k], { skipChanges: true });
-                }
-            }
-            let promises = [];
-            for (let k in rels) {
-                if (rels[k].data && collections[k]) {
-                    rels[k].data.forEach((relData) => {
-                        promises.push(
-                            collections[k].model(relData)
-                                .then((relModel) => {
-                                    this.addRelationship(k, relModel);
-                                })
-                        );
-                    });
-                }
-            }
-            return Promise.all(promises);
+            return Promise.resolve();
         });
     }
 
@@ -153,7 +153,7 @@ export class BaseModel extends Model {
 
     fetchRelationship(name, options) {
         let collection = this.getRelationship(name);
-        if (collection && (collection.fetched || this.isNew())) {
+        if (collection && (!options && collection.fetched || this.isNew())) {
             return Promise.resolve(collection);
         }
         if (!this.id) {

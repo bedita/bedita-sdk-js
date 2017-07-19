@@ -47,14 +47,14 @@ const SCHEMA = {
                     oneOf: [
                         { type: 'null' },
                         { type: 'string' },
-                    ]
+                    ],
                 },
                 extra: {
                     oneOf: [
                         { type: 'null' },
                         { type: 'string' },
                         { type: 'object' },
-                    ]
+                    ],
                 },
                 $modified: {
                     type: 'number',
@@ -75,7 +75,7 @@ const SCHEMA = {
                 },
             },
         },
-    ]
+    ],
 };
 
 export class ObjectModel extends BaseModel {

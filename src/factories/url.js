@@ -1,35 +1,35 @@
 import { Factory } from '@chialab/synapse/src/factory.js';
+import objectPath from 'object-path';
 
 export class Url extends Factory {
-    serialize(obj, prefix) {
+    chunk(key, val) {
+        if (val) {
+            return `${encodeURIComponent(key)}=${encodeURIComponent(val)}`;
+        }
+        return `${encodeURIComponent(key)}`;
+    }
+
+    serialize(obj, prefix, chunkFn) {
+        chunkFn = chunkFn || this.chunk;
         let str = [];
-        if (Array.isArray(obj)) {
-            let paramKey = encodeURIComponent(`${prefix}[]`);
-            obj.forEach((val) => {
-                str.push(`${paramKey}=${encodeURIComponent(val)}`);
-            });
-        } else if (typeof obj === 'object') {
-            let keys = Object.keys(obj);
-            if (keys.length) {
-                for (let p in obj) {
-                    if (obj.hasOwnProperty(p) && p !== undefined) {
-                        let k = prefix ? `${prefix}[${p}]` : p;
-                        let v = obj[p];
-                        if (v instanceof Date) {
-                            v = v.toISOString();
-                        }
-                        str.push(
-                            (v !== null && typeof v === 'object') ?
-                                this.serialize(v, k) :
-                                `${encodeURIComponent(k)}=${encodeURIComponent(v)}`
-                        );
+        let keys = Object.keys(obj);
+        if (keys.length) {
+            for (let p in obj) {
+                if (obj.hasOwnProperty(p) && obj[p] !== undefined) {
+                    let k = prefix ? `${prefix}[${p}]` : p;
+                    let v = obj[p];
+                    if (v instanceof Date) {
+                        v = v.toISOString();
                     }
+                    str.push(
+                        (v !== null && typeof v === 'object') ?
+                            this.serialize(v, k) :
+                            chunkFn(k, `${v}`)
+                    );
                 }
-            } else if (prefix) {
-                str.push(`${encodeURIComponent(prefix)}`);
             }
         } else if (prefix) {
-            str.push(`${encodeURIComponent(prefix)}`);
+            str.push(chunkFn(prefix));
         }
         return str.join('&');
     }
@@ -41,16 +41,10 @@ export class Url extends Factory {
 
         for (let i = 0, len = chunks.length; i < len; i++) {
             let chunk = chunks[i].split('=');
-            if (chunk[0].search("\\[\\]") !== -1) {
-                chunk[0] = chunk[0].replace(/\[\]$/, '');
-                if (typeof res[chunk[0]] === 'undefined') {
-                    res[chunk[0]] = [chunk[1]];
-
-                } else {
-                    res[chunk[0]].push(chunk[1]);
-                }
-            } else {
-                res[chunk[0]] = chunk[1];
+            if (chunk[0] && chunk[1]) {
+                let key = chunk[0].replace(/\[(.*?)\]/g, '.$1');
+                let val = decodeURIComponent(chunk[1]);
+                objectPath.set(res, key, val);
             }
         }
 

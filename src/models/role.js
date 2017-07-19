@@ -14,7 +14,7 @@ const SCHEMA = {
         },
         metadata: {
             $ref: '#/definitions/metadata',
-        }
+        },
     },
 };
 

@@ -41,6 +41,13 @@ export class RelationshipsCollection extends Collection {
             });
     }
 
+    add(...models) {
+        super.add(...models);
+        models.forEach((model) => {
+            this.parent.addRelationship(this.name, model);
+        });
+    }
+
     getMinimalPropertiesSet() {
         if (this.type && this.type.length === 1) {
             let Ctr = this.factory('registry').getCollection(this.type[0]);
@@ -115,11 +122,8 @@ export class RelationshipsCollection extends Collection {
         }
     }
 
-    post(model, options) {
-        return super.post(model, options);
-    }
-
     findAll(options = {}) {
+        options = Collection.clone(options);
         if (!options.endpoint) {
             options.endpoint = `${this.parent.type}/${this.parent.id}/${this.name}`;
         }
@@ -128,7 +132,9 @@ export class RelationshipsCollection extends Collection {
                 this.fetched = true;
                 let paramsList = this.paramsList || [];
                 this.forEach((model, index) => {
-                    this.parent.setRelationshipMeta(this.name, model, paramsList[index], false);
+                    if (paramsList[index]) {
+                        this.parent.setRelationshipMeta(this.name, model, paramsList[index], false);
+                    }
                 });
                 this.resetChanges();
                 return Promise.resolve(res);
@@ -223,5 +229,20 @@ export class RelationshipsCollection extends Collection {
             this.resetChanges();
             return this.findAll();
         });
+    }
+
+    /** @inheritdoc */
+    joinCollection(collection) {
+        return super.joinCollection(collection)
+            .then(() => {
+                this.paramsList = this.paramsList || [];
+                this.paramsList.push(...(collection.paramsList || []));
+                return Promise.resolve();
+            });
+    }
+
+    /** @inheritdoc */
+    getCleanCopy() {
+        return this.initClass(this.constructor, this.name, this.parent);
     }
 }
