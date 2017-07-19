@@ -9,15 +9,19 @@ export class Registry extends Factory {
         return [];
     }
 
-    initialize(...args) {
+    initialize(options = {}) {
         this.models = {};
         this.collections = {};
-        return super.initialize(...args)
+        return super.initialize(options)
             .then(() => {
-                (this.constructor.collections || []).forEach((Collection) => {
+                let collections = (this.constructor.collections || []);
+                collections.push(...(options.collections || []));
+                collections.forEach((Collection) => {
                     this.registerCollection(Collection);
                 });
-                (this.constructor.models || []).forEach((Model) => {
+                let models = (this.constructor.models || []);
+                models.push(...(options.models || []));
+                models.forEach((Model) => {
                     this.registerModel(Model);
                 });
                 return Promise.resolve(this);
@@ -25,11 +29,14 @@ export class Registry extends Factory {
     }
 
     registerModel(Model) {
-        this.models[Model.prototype.type] = Model;
+        this.models[Model.prototype.type || Model.type] = Model;
     }
 
     getModel(type) {
-        return this.models[type];
+        if (this.hasModel(type)) {
+            return this.models[type];
+        }
+        this.factory('debug').error(`registry -> Missing Collection for ${type}`);
     }
 
     hasModel(type) {
@@ -37,11 +44,14 @@ export class Registry extends Factory {
     }
 
     registerCollection(Collection) {
-        this.collections[Collection.prototype.type] = Collection;
+        this.collections[Collection.prototype.type || Collection.type] = Collection;
     }
 
     getCollection(type) {
-        return this.collections[type];
+        if (this.hasCollection(type)) {
+            return this.collections[type];
+        }
+        this.factory('debug').error(`registry -> Missing Collection for ${type}`);
     }
 
     hasCollection(type) {

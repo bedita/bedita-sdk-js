@@ -23,10 +23,10 @@ export class Session extends Factory {
         if (!internal(this).userPromise) {
             const Collection = this.factory('registry').getCollection('users');
             internal(this).userPromise = this.initClass(Collection)
-                .then((table) =>
+                .then((collection) =>
                     this.factory('api').me()
                         .then((res) =>
-                            table.model()
+                            collection.model()
                                 .then((model) => 
                                     model.setFromResponse(res.data)
                                         .then(() => {
@@ -57,8 +57,8 @@ export class Session extends Factory {
         if (res.meta) {
             const Collection = this.factory('registry').getCollection('users');
             return this.initClass(Collection)
-                .then((table) =>
-                    table.model()
+                .then((collection) =>
+                    collection.model()
                         .then((model) =>
                             model.setFromResponse(res.data)
                                 .then(() => {

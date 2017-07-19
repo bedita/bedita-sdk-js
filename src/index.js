@@ -1,4 +1,5 @@
 import { mix } from '@chialab/synapse/src/helpers/mixin.js';
+import { internal } from '@chialab/synapse/src/helpers/internal.js';
 import { Factory } from '@chialab/synapse/src/factory.js';
 import { InjectableMixin } from '@chialab/synapse/src/mixins/injectable.js';
 
@@ -43,16 +44,28 @@ export class Client extends mix(Factory).with(InjectableMixin) {
 
     constructor(options) {
         super();
-        this.addReadyPromise(
-            this.initialize(options)
-        );
+        if (!this.getContext()) {
+            this.addReadyPromise(
+                this.initialize(options)
+            );
+        }
     }
 
     initialize(options) {
+        internal(this).options = options;
         return super.initialize(options)
             .then(() => {
-                const api = this.factory('api');
-                api.config(options);
+                this.factory('api').config(options);
+                if (Array.isArray(options.models)) {
+                    options.models.forEach((Model) => {
+                        this.registerModel(Model);
+                    });
+                }
+                if (Array.isArray(options.collections)) {
+                    options.collections.forEach((Collection) => {
+                        this.registerCollection(Collection);
+                    });
+                }
                 return Promise.resolve();
             });
     }

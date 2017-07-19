@@ -57,7 +57,11 @@ const SCHEMA = {
                     ],
                 },
                 $modified: {
-                    type: 'number',
+                    oneOf: [
+                        { type: 'null' },
+                        { type: 'string', format: 'date-time' },
+                        { type: 'object', format: 'date-time' },
+                    ],
                 },
                 $deleted: {
                     type: 'boolean',
@@ -81,9 +85,5 @@ const SCHEMA = {
 export class ObjectModel extends BaseModel {
     static get schema() {
         return SCHEMA;
-    }
-
-    static get type() {
-        return 'objects';
     }
 }

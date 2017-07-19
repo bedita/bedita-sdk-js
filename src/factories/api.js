@@ -12,6 +12,13 @@ export class Api extends Factory {
         return this.options && this.options.storage || localStorage;
     }
 
+    initialize(options) {
+        if (options) {
+            this.config(options);
+        }
+        return super.initialize(options);
+    }
+
     config(options = {}) {
         this.options = options;
         this.restore();
@@ -58,7 +65,7 @@ export class Api extends Factory {
                 options.headers['content-type'] = 'application/x-www-form-urlencoded';
             }
         }
-        this.factory('debug').log(`api -> [${options.method.toUpperCase()}]`, url);
+        this.factory('debug').log(`api -> [${(options.method || 'get').toUpperCase()}]`, url);
         return fetch(url, options)
             .then((res) =>
                 res.text()
@@ -86,6 +93,8 @@ export class Api extends Factory {
         queue = queue
             .catch(() => Promise.resolve())
             .then(() => fn());
+        
+        return queue;
     }
 
     get(api, options) {

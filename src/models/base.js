@@ -60,7 +60,7 @@ export class BaseModel extends Model {
                         this.trigger('synced')
                             .then(() =>
                                 Promise.resolve(lastRes)
-                        )
+                            )
                     )
             );
         }
