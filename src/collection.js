@@ -65,10 +65,10 @@ export class Collection extends AjaxCollection {
                         return modelConvertion
                             .then((convertedModel) => {
                                 convertedModel.resetChanges();
-                                return convertedModel.setFromResponse(data)
+                                return convertedModel.setFromResponse(data);
                             })
                             .catch((err) => {
-                                console.log(err);
+                                this.factory('debug').error('model convertion ->', err);
                             });
                     })
             );

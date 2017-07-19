@@ -58,6 +58,7 @@ export class Api extends Factory {
                 options.headers['content-type'] = 'application/x-www-form-urlencoded';
             }
         }
+        this.factory('debug').log(`api -> [${options.method.toUpperCase()}]`, url);
         return fetch(url, options)
             .then((res) =>
                 res.text()

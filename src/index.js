@@ -22,11 +22,13 @@ import { Api } from './factories/api.js';
 import { Url } from './factories/url.js';
 import { Registry } from './factories/registry.js';
 import { Session } from './factories/session.js';
+import { Debug } from './factories/debug.js';
 
 export { Api };
 export { Url };
 export { Registry };
 export { Session };
+export { Debug };
 
 export class Client extends mix(Factory).with(InjectableMixin) {
     static get injectors() {
@@ -35,6 +37,7 @@ export class Client extends mix(Factory).with(InjectableMixin) {
             api: Api,
             registry: Registry,
             session: Session,
+            debug: Debug,
         };
     }
 
