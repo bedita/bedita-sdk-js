@@ -87,7 +87,8 @@ export class RelationshipsCollection extends Collection {
                         let endpoint = Array.isArray(types) ?
                             `/objects?${types.map((type) => `filter[type][]=${type}`).join('&')}` :
                             `/${types}`;
-                        return collection.findAll({ endpoint });
+                        return collection.findAll({ endpoint })
+                            .then(() => Promise.resolve(collection));
                     });
             });
     }

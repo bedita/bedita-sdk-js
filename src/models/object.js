@@ -82,4 +82,8 @@ export class ObjectModel extends BaseModel {
     static get schema() {
         return SCHEMA;
     }
+
+    static get type() {
+        return 'objects';
+    }
 }

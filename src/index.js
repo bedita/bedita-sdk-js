@@ -15,15 +15,18 @@ export * from './collection.js';
 export * from './collections/relationships.js';
 export * from './collections/types.js';
 export * from './collections/roles.js';
+export * from './collections/objects.js';
 export * from './collections/users.js';
 
 import { Api } from './factories/api.js';
 import { Url } from './factories/url.js';
 import { Registry } from './factories/registry.js';
+import { Session } from './factories/session.js';
 
 export { Api };
 export { Url };
 export { Registry };
+export { Session };
 
 export class Client extends mix(Factory).with(InjectableMixin) {
     static get injectors() {
@@ -31,6 +34,7 @@ export class Client extends mix(Factory).with(InjectableMixin) {
             url: Url,
             api: Api,
             registry: Registry,
+            session: Session,
         };
     }
 
@@ -46,7 +50,6 @@ export class Client extends mix(Factory).with(InjectableMixin) {
             .then(() => {
                 const api = this.factory('api');
                 api.config(options);
-                api.restore();
                 return Promise.resolve();
             });
     }

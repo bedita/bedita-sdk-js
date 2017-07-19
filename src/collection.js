@@ -1,5 +1,4 @@
-import { internal } from '@chialab/synapse/src/helpers/internal.js';
-import { AjaxCollection } from '@chialab/synapse/src/collections/ajax.js';
+import { internal, AjaxCollection } from '@chialab/synapse';
 import { Model } from './model.js';
 
 export class Collection extends AjaxCollection {
@@ -16,7 +15,7 @@ export class Collection extends AjaxCollection {
     }
 
     get type() {
-        return this.constructor.Model.prototype.type;
+        return this.constructor.Model.prototype.type || this.constructor.Model.type;
     }
 
     get extendable() {
@@ -43,13 +42,36 @@ export class Collection extends AjaxCollection {
         let id = model.get('id');
         if (!api && id) {
             let Entity = options.Model || this.constructor.Model;
-            api = `${Entity.prototype.type}/${id}`;
+            api = `${Entity.prototype.type || Entity.type}/${id}`;
         }
         if (!api) {
             return Promise.reject();
         }
         options.endpoint = api;
-        return super.fetch(model, options);
+        return this.beforeFetch(options)
+            .then((options) =>
+                this.execFetch(options)
+                    .then((res) =>
+                        this.afterFetch(res)
+                    )
+                    .then((data) => {
+                        let modelConvertion = Promise.resolve(model);
+                        if (data.type) {
+                            const Model = this.factory('registry').getModel(data.type);
+                            if (Model && !(model instanceof Model)) {
+                                modelConvertion = this.initClass(Model);
+                            }
+                        }
+                        return modelConvertion
+                            .then((convertedModel) => {
+                                convertedModel.resetChanges();
+                                return convertedModel.setFromResponse(data)
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                            });
+                    })
+            );
     }
 
     afterFetch(res) {
@@ -134,7 +156,7 @@ export class Collection extends AjaxCollection {
     findAll(options = {}) {
         options = Collection.clone(options);
         let Entity = options.Model || this.constructor.Model;
-        let endpoint = options.endpoint || this.endpoint || Entity.prototype.type;
+        let endpoint = options.endpoint || this.endpoint || Entity.prototype.type || Entity.type;
         if (!endpoint) {
             return Promise.reject();
         }
@@ -209,8 +231,10 @@ export class Collection extends AjaxCollection {
         let endpoint = this.endpoint;
         if (endpoint) {
             let sort = this.factory('url').getSearchParam(endpoint, 'sort');
+            let metaField = field.replace('metadata.', '');
             if (sort) {
-                return sort === field || sort === `-${field}`;
+                return sort === field || sort === `-${field}` ||
+                    sort === metaField || sort === `-${metaField}`;
             }
         }
         return false;
@@ -259,7 +283,7 @@ export class Collection extends AjaxCollection {
     }
 
     getMinimalPropertiesSet() {
-        return ['id', 'uname', 'title', 'metadata.created', 'metadata.modified'];
+        return ['id', 'type', 'uname', 'title', 'metadata.created', 'metadata.modified'];
     }
 
     /**

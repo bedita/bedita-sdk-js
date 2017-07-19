@@ -182,4 +182,16 @@ export class Api extends Factory {
         this.unsetAccessToken();
         this.unsetRenewToken();
     }
+
+    types() {
+        return this.get('object_types')
+            .then((res) => {
+                if (res && res.data) {
+                    return Promise.resolve(
+                        res.data.map((type) => type.attributes.name)
+                    );
+                }
+                return Promise.resolve([]);
+            });
+    }
 }
