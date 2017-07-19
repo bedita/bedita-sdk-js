@@ -6,6 +6,10 @@
   "scripts": {
     "build": "rollup src/index.js --config --output dist/bedita-sdk.js"
   },
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/bedita/bedita-sdk-js.git"
+  },
   "keywords": [
     "bedita",
     "models",
