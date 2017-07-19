@@ -18,3 +18,4 @@ Thumbs.db
 # App
 npm-debug.log
 /node_modules
+/dist
