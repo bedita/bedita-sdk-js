@@ -22,3 +22,7 @@ npm install bedita-sdk-js
 npm install
 npm run build
 ```
+
+## Licensing
+
+BEdita is released under [LGPL](/bedita/bedita-sdk-js/blob/master/LICENSE.LGPL), Lesser General Public License.

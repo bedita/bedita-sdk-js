@@ -16,7 +16,7 @@
     "api"
   ],
   "author": "BEdita <info@bedita.com> (http://www.bedita.com)",
-  "license": "MIT",
+  "license": "LGPL",
   "dependencies": {
     "@chialab/synapse": "github:chialab/synapse#670e80a"
   },
