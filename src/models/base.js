@@ -1,0 +1,227 @@
+import { Model } from '../model.js';
+import { RelationshipsCollection } from '../collections/relationships.js';
+
+const REL_KEY = 'relationships';
+const REL_META_KEY = 'relationshipsMeta';
+
+export class BaseModel extends Model {
+    initialize(...args) {
+        return super.initialize(...args)
+            .then(() =>
+                this.setupRelationships()
+            );
+    }
+
+    merge(model) {
+        return super.merge(model)
+            .then(() => {
+                let rels = model.getRelationships() || {};
+                return this.setupRelationships(rels);
+            });
+    }
+
+    reset(skip) {
+        let rels = this.getRelationships() || {};
+        Object.keys(rels).forEach((name) => {
+            rels[name].reset(skip);
+        });
+        this.set(REL_META_KEY, undefined, { internal: true });
+        return super.reset(skip);
+    }
+
+    setFromResponse(res) {
+        if (res) {
+            let relPromise = Promise.resolve();
+            if (res.relationships) {
+                relPromise = this.setupRelationships(res.relationships);
+                delete res.relationships;
+            }
+            return relPromise.then(() =>
+                super.setFromResponse(res).then((lastRes) => {
+                    this.trigger('synced');
+                    return Promise.resolve(lastRes);
+                })
+            );
+        }
+        return super.setFromResponse(res);
+    }
+
+    getRelationships() {
+        return this.get(REL_KEY, { internal: true });
+    }
+
+    setRelationships(data) {
+        return this.set(REL_KEY, data, { internal: true, skipChanges: true });
+    }
+
+    fetchRelationships(options = {}) {
+        let collections = this.getRelationships();
+        let available = Object.keys(collections);
+        let filterRelationships = options.relationships;
+        if (filterRelationships === true) {
+            filterRelationships = available;
+        }
+        let promise = Promise.resolve();
+        available
+            .filter((name) => {
+                if (filterRelationships && filterRelationships.indexOf(name) === -1) {
+                    return false;
+                }
+                return true;
+            })
+            .forEach((relName) => {
+                promise = promise.then(() => this.fetchRelationship(relName));
+            });
+        return promise.then(() => Promise.resolve(this));
+    }
+
+    postRelationships() {
+        let collections = this.getRelationships();
+        return Promise.all(
+            // update sub models
+            Object.keys(collections).map((relName) => {
+                let collection = collections[relName];
+                let relationships = (collection || [])
+                    .filter((model) =>
+                        model.isNew() || model.hasChanges()
+                    );
+                return Promise.all(
+                    relationships.map((model) => collection.post(model))
+                );
+            })
+        ).then(() => {
+            // update relationships
+            let promise = Promise.resolve();
+            Object.keys(collections).forEach((relName) => {
+                promise = promise.then(() => collections[relName].update());
+            });
+            return promise;
+        });
+    }
+
+    setupRelationships(rels = {}) {
+        let ctrRels = this.constructor.relationships || {};
+        let collections = this.getRelationships() || {};
+        let keys = Object.keys(rels);
+        Object.keys(ctrRels).forEach((ctrRel) => {
+            if (keys.indexOf(ctrRel) === -1) {
+                keys.push(ctrRel);
+            }
+        });
+        return Promise.all(
+            keys.map((name) => {
+                if (!collections.hasOwnProperty(name)) {
+                    return this.initClass(RelationshipsCollection, name, this)
+                        .then((collection) => {
+                            collections[name] = collection;
+                            return Promise.resolve();
+                        });
+                }
+                return Promise.resolve();
+            })
+        ).then(() => {
+            this.setRelationships(collections);
+            for (let k in ctrRels) {
+                if (ctrRels[k].alias) {
+                    this.set(ctrRels[k].alias, collections[k], { skipChanges: true });
+                }
+            }
+            let promises = [];
+            for (let k in rels) {
+                if (rels[k].data && collections[k]) {
+                    rels[k].data.forEach((relData) => {
+                        promises.push(
+                            collections[k].model(relData)
+                                .then((relModel) => {
+                                    this.addRelationship(k, relModel);
+                                })
+                        );
+                    });
+                }
+            }
+            return Promise.all(promises);
+        });
+    }
+
+    getRelationship(name) {
+        let collections = this.getRelationships();
+        if (collections) {
+            return collections[name];
+        }
+        return undefined;
+    }
+
+    fetchRelationship(name, options) {
+        let collection = this.getRelationship(name);
+        if (collection && (collection.fetched || this.isNew())) {
+            return Promise.resolve(collection);
+        }
+        if (!this.id) {
+            return Promise.reject(new Error('Missing id'));
+        }
+        if (!collection) {
+            return Promise.reject(new Error('Unavailable relationship'));
+        }
+        return collection.findAll(options).then(() => Promise.resolve(collection));
+    }
+
+    addRelationship(name, model, params) {
+        let collection = this.getRelationship(name);
+        if (collection.getIndexById(model.id) === -1) {
+            collection.add(model);
+        }
+        if (params) {
+            this.setRelationshipMeta(name, model, params, true);
+        }
+    }
+
+    removeRelationship(name, model) {
+        let collection = this.getRelationship(name);
+        return collection.remove(model);
+    }
+
+    getRelationshipMeta(relName, model) {
+        let relMeta = this.get(REL_META_KEY, { internal: true }) || {};
+        return relMeta[relName] && relMeta[relName][model.id];
+    }
+
+    setRelationshipMeta(relName, model, meta, trigger) {
+        let relMeta = this.get(REL_META_KEY, { internal: true }) || {};
+        relMeta[relName] = relMeta[relName] || {};
+        relMeta[relName][model.id] = meta;
+        this.set(REL_META_KEY, relMeta, { internal: true });
+        if (trigger) {
+            this.trigger('relparams:change', {
+                name: relName,
+                left: this,
+                right: model,
+                meta,
+            });
+        }
+    }
+
+    hasRelationshipsChanges() {
+        let collections = this.getRelationships();
+        for (let k in collections) {
+            if (collections[k].hasChanges()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    setRelationshipParam(relName, model, paramName, paramValue) {
+        let relMeta = this.getRelationshipMeta(relName, model) || {};
+        relMeta.params = relMeta.params || {};
+        if (relMeta.params[paramName] !== paramValue) {
+            relMeta.params[paramName] = paramValue;
+            relMeta.changed = true;
+            this.setRelationshipMeta(relName, model, relMeta, true);
+        }
+    }
+
+    getRelationshipTypes(relName) {
+        let rels = this.constructor.relationships || {};
+        return rels[relName] && rels[relName].types;
+    }
+}

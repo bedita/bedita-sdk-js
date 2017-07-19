@@ -1,0 +1,27 @@
+{
+  "name": "bedita-sdk-js",
+  "version": "4.0.0",
+  "description": "BEdita SDK for JavaScript.",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "rollup src/index.js --config --output dist/bedita-data.js"
+  },
+  "keywords": [
+    "bedita",
+    "models",
+    "api"
+  ],
+  "author": "BEdita <info@bedita.com> (http://www.bedita.com)",
+  "license": "MIT",
+  "dependencies": {
+    "@chialab/synapse": "github:chialab/synapse#670e80a"
+  },
+  "devDependencies": {
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-es2015": "^6.24.1",
+    "rollup": "^0.41.6",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-node-resolve": "^3.0.0"
+  }
+}
