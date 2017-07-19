@@ -4,7 +4,7 @@
   "description": "BEdita SDK for JavaScript.",
   "main": "src/index.js",
   "scripts": {
-    "build": "rollup src/index.js --config --output dist/bedita-data.js"
+    "build": "rollup src/index.js --config --output dist/bedita-sdk.js"
   },
   "keywords": [
     "bedita",

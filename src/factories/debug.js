@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { Factory } from '@chialab/synapse';
+import { Factory } from '@chialab/synapse/src/factory.js';
 
 export class Debug extends Factory {
     log(...args) {

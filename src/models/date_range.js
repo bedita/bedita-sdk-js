@@ -1,4 +1,5 @@
-import { internal, Model } from '@chialab/synapse';
+import { internal } from '@chialab/synapse/src/helpers/internal.js';
+import { Model } from '@chialab/synapse/src/model.js';
 
 const SCHEMA = {
     type: 'object',

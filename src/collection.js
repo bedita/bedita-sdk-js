@@ -1,4 +1,5 @@
-import { internal, AjaxCollection } from '@chialab/synapse';
+import { internal } from '@chialab/synapse/src/helpers/internal.js';
+import { AjaxCollection } from '@chialab/synapse/src/collections/ajax.js';
 import { Model } from './model.js';
 
 export class Collection extends AjaxCollection {

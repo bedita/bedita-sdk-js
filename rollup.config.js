@@ -9,8 +9,14 @@ export default {
         commonjs({
             include: [
                 'node_modules/tv4/**/*',
+                'node_modules/object-path/**/*',
             ],
         }),
-        babel(),
+        babel({
+            include: [
+                'node_modules/@chialab/**/*.js',
+                'node_modules/chialab-*/**/*.js',
+            ],
+        }),
     ]
 };
