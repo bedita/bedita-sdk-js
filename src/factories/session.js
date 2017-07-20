@@ -2,17 +2,6 @@ import { internal } from '@chialab/synapse/src/helpers/internal.js';
 import { Factory } from '@chialab/synapse/src/factory.js';
 
 export class Session extends Factory {
-    initialize(...args) {
-        return super.initialize(...args)
-            .then(() =>
-                this.getUser()
-                    .catch(() => {
-                        this.factory('api').logout();
-                        return Promise.resolve();
-                    })
-            );
-    }
-
     getUser() {
         if (this.user) {
             return Promise.resolve(this.user);
@@ -27,7 +16,7 @@ export class Session extends Factory {
                     this.factory('api').me()
                         .then((res) =>
                             collection.model()
-                                .then((model) => 
+                                .then((model) =>
                                     model.setFromResponse(res.data)
                                         .then(() => {
                                             this.user = model;
@@ -36,7 +25,10 @@ export class Session extends Factory {
                                         })
                                 )
                         )
-                );
+                ).catch((res) => {
+                    this.factory('api').logout();
+                    return Promise.reject(res);
+                });
         }
         return internal(this).userPromise;
     }
