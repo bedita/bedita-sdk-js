@@ -10,6 +10,9 @@ export * from './models/role.js';
 export * from './models/type.js';
 export * from './models/object.js';
 export * from './models/user.js';
+export * from './models/stream.js';
+export * from './models/media.js';
+export * from './models/image.js';
 
 // COLLECTIONS
 export * from './collection.js';
@@ -18,6 +21,8 @@ export * from './collections/types.js';
 export * from './collections/roles.js';
 export * from './collections/objects.js';
 export * from './collections/users.js';
+export * from './collections/streams.js';
+export * from './collections/media.js';
 
 import { Api } from './factories/api.js';
 import { Url } from './factories/url.js';
