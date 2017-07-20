@@ -46,19 +46,20 @@ const SCHEMA = {
                 lang: {
                     oneOf: [
                         { type: 'null' },
-                        { type: 'string' },
+                        { type: 'string', maximum: 255 },
                     ],
                 },
                 extra: {
                     oneOf: [
                         { type: 'null' },
-                        { type: 'string' },
+                        { type: 'string', maximum: 255 },
                         { type: 'object' },
                     ],
                 },
                 $modified: {
                     oneOf: [
                         { type: 'null' },
+                        { type: 'number' },
                         { type: 'string', format: 'date-time' },
                         { type: 'object', format: 'date-time' },
                     ],
@@ -85,5 +86,9 @@ const SCHEMA = {
 export class ObjectModel extends BaseModel {
     static get schema() {
         return SCHEMA;
+    }
+
+    static get type() {
+        return 'objects';
     }
 }

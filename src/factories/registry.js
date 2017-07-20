@@ -36,7 +36,7 @@ export class Registry extends Factory {
         if (this.hasModel(type)) {
             return this.models[type];
         }
-        this.factory('debug').error(`registry -> Missing Collection for ${type}`);
+        this.factory('debug').warn(`registry -> Missing Collection for ${type}`);
     }
 
     hasModel(type) {
@@ -51,7 +51,7 @@ export class Registry extends Factory {
         if (this.hasCollection(type)) {
             return this.collections[type];
         }
-        this.factory('debug').error(`registry -> Missing Collection for ${type}`);
+        this.factory('debug').warn(`registry -> Missing Collection for ${type}`);
     }
 
     hasCollection(type) {
