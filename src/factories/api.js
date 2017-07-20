@@ -166,7 +166,7 @@ export class Api extends Factory {
         }
         let token = this.token;
         this.token = this.renewToken;
-        return this.post('auth')
+        return this.request('auth', { method: 'POST' })
             .then((res) => {
                 this.onAuth(res);
                 return Promise.resolve(res);
