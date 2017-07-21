@@ -47,7 +47,6 @@ export class Api extends Factory {
 
     request(api, options = {}) {
         let url = this.resolve(api);
-        options = options ? SchemaModel.clone(options) : {};
         options.headers = options.headers || {};
         options.headers['accept'] = 'application/vnd.api+json';
         options.headers['x-requested-with'] = 'XMLHttpRequest';
@@ -58,10 +57,11 @@ export class Api extends Factory {
             options.headers['Authorization'] = `Bearer ${this.token}`;
         }
         if (options.body) {
-            if (typeof options.body === 'object') {
+            if (Object.prototype.toString.call(options.body) === '[object Object]') {
                 options.headers['content-type'] = 'application/json';
                 options.body = JSON.stringify(options.body);
-            } else if (!options.headers['content-type']) {
+            }
+            if (!options.headers['content-type']) {
                 options.headers['content-type'] = 'application/x-www-form-urlencoded';
             }
         }

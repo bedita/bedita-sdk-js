@@ -6,6 +6,7 @@ const SCHEMA = {
     properties: {
         id: { type: 'string', maximum: 255 },
         name: { type: 'string', maximum: 255 },
+        type: { type: 'string', maximum: 255 },
         description: {
             oneOf: [
                 { type: 'null' },

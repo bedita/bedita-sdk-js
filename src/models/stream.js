@@ -1,12 +1,14 @@
 import { BaseModel } from './base.js';
+import { RELATIONSHIP_MODES } from '../collections/relationships.js';
 
 const SCHEMA = {
     definitions: BaseModel.schema.definitions,
     type: 'object',
     properties: {
         id: { type: 'string', maximum: 36 },
-        file_name: { type: 'string' },
-        mime_type: { type: 'string' },
+        type: { type: 'string', maximum: 255 },
+        file_name: { type: 'string', maximum: 255 },
+        mime_type: { type: 'string', maximum: 255 },
         metadata: {
             allOf: [
                 { $ref: '#/definitions/metadata' },
@@ -33,6 +35,15 @@ const SCHEMA = {
 export class StreamModel extends BaseModel {
     static get schema() {
         return SCHEMA;
+    }
+
+    static get relationships() {
+        return {
+            object: {
+                types: ['media'],
+                mode: RELATIONSHIP_MODES.ONE_TO_ONE,
+            },
+        };
     }
 
     get type() {

@@ -11,7 +11,7 @@ export class StreamsCollection extends Collection {
     upload(file, media) {
         return this.factory('api').post(`/streams/upload/${file.name}`, file, {
             headers: {
-                'Content-Type': file.type,
+                'content-type': file.type,
             },
         }).then((res) =>
             this.model()
@@ -36,11 +36,17 @@ export class StreamsCollection extends Collection {
                                     );
                             }).then((mediaModel) => {
                                 streamModel.addRelationship('object', mediaModel);
-                                return this.post(streamModel);
-                            });
+                                return streamModel.getRelationship('object').update();
+                            }).then(() =>
+                                Promise.resolve(streamModel)
+                            );
                     }
                     return Promise.resolve(streamModel);
                 })
         );
+    }
+
+    getMinimalPropertiesSet() {
+        return ['metadata.url', 'file_name', 'mime_type', 'metadata.version'];
     }
 }

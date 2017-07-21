@@ -19,10 +19,6 @@ export class Collection extends AjaxCollection {
         return this.constructor.Model.prototype.type || this.constructor.Model.type;
     }
 
-    get extendable() {
-        return false;
-    }
-
     model(data, Entity) {
         if (!Entity && data && data.type) {
             Entity = this.factory('registry').getModel(data.type);

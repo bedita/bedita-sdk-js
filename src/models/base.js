@@ -219,9 +219,4 @@ export class BaseModel extends Model {
             this.setRelationshipMeta(relName, model, relMeta, true);
         }
     }
-
-    getRelationshipTypes(relName) {
-        let rels = this.constructor.relationships || {};
-        return rels[relName] && rels[relName].types;
-    }
 }

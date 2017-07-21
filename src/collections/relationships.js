@@ -1,13 +1,22 @@
 import { Collection } from '../collection.js';
 import { TypesCollection } from './types.js';
 
+export const RELATIONSHIP_MODES = {
+    ONE_TO_MANY: 0,
+    ONE_TO_ONE: 1,
+};
+
 export class RelationshipsCollection extends Collection {
-    get extendable() {
-        return true;
+    get type() {
+        let parent = this.parent;
+        let rels = parent.constructor.relationships || {};
+        return rels[this.name] && rels[this.name].types;
     }
 
-    get type() {
-        return this.parent.getRelationshipTypes(this.name);
+    get mode() {
+        let parent = this.parent;
+        let rels = parent.constructor.relationships || {};
+        return rels.hasOwnProperty(this.name) ? rels[this.name].mode : RELATIONSHIP_MODES.ONE_TO_MANY;
     }
 
     initialize(name, left) {
@@ -23,19 +32,23 @@ export class RelationshipsCollection extends Collection {
                         this.trigger('change');
                     }
                 });
-                this.on('updated', () => {
-                    left.trigger('relationship:updated');
-                    left.trigger('relationship:change');
-                });
-                this.on('added', (index, model) => {
-                    left.trigger('relationship:added');
-                    left.trigger('relationship:change');
-                    this.updateRelationshipsChanges(model, 'add');
-                });
-                this.on('removed', (index, model) => {
-                    left.trigger('relationship:removed');
-                    left.trigger('relationship:change');
-                    this.updateRelationshipsChanges(model, 'remove');
+                this.on('change', (changes) => {
+                    if (changes.type === 'add') {
+                        left.trigger('relationship:added');
+                        left.trigger('relationship:change');
+                        changes.added.forEach((model) => {
+                            this.updateRelationshipsChanges(model, 'add');
+                        });
+                    } else if (changes.type === 'remove') {
+                        left.trigger('relationship:removed');
+                        left.trigger('relationship:change');
+                        changes.removed.forEach((model) => {
+                            this.updateRelationshipsChanges(model, 'remove');
+                        });
+                    } else if (changes.type === 'update') {
+                        left.trigger('relationship:updated');
+                        left.trigger('relationship:change');
+                    }
                 });
                 return Promise.resolve();
             });
@@ -143,6 +156,11 @@ export class RelationshipsCollection extends Collection {
     }
 
     afterFetch(res) {
+        if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
+            if (res && res.data) {
+                res.data = [res.data];
+            }
+        }
         this.paramsList = (res && res.data || []).map((d) => {
             if (d.meta && d.meta.relation) {
                 let p = {
@@ -175,56 +193,104 @@ export class RelationshipsCollection extends Collection {
         let changes = this.changes;
         let promise = Promise.resolve();
         if (changes.removed.length) {
-            promise = promise.then(() =>
-                this.execPost({
-                    endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
-                    body: {
-                        data: changes.removed.map((model) => {
-                            ids.push(model.id);
-                            return {
-                                id: model.id,
-                                type: model.type,
-                            };
-                        }),
-                    },
-                    method: 'DELETE',
-                })
-            );
+            if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
+                promise = promise.then(() =>
+                    this.execPost({
+                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        body: null,
+                        method: 'PATCH',
+                    })
+                );
+            } else {
+                promise = promise.then(() =>
+                    this.execPost({
+                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        body: {
+                            data: changes.removed.map((model) => {
+                                ids.push(model.id);
+                                return {
+                                    id: model.id,
+                                    type: model.type,
+                                };
+                            }),
+                        },
+                        method: 'DELETE',
+                    })
+                );
+            }
         }
         if (changes.added.length) {
-            promise = promise.then(() =>
-                this.execPost({
-                    endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
-                    body: {
-                        data: changes.added.map((model) => {
-                            ids.push(model.id);
-                            return {
+            if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
+                let model = changes.added[0];
+                promise = promise.then(() =>
+                    this.execPost({
+                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        body: {
+                            data: {
                                 id: model.id,
                                 type: model.type,
                                 meta: {
                                     relation: this.parent.getRelationshipMeta(this.name, model),
                                 },
-                            };
-                        }),
-                    },
-                })
-            );
+                            },
+                        },
+                        method: 'PATCH',
+                    })
+                );
+            } else {
+                promise = promise.then(() =>
+                    this.execPost({
+                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        body: {
+                            data: changes.added.map((model) => {
+                                ids.push(model.id);
+                                return {
+                                    id: model.id,
+                                    type: model.type,
+                                    meta: {
+                                        relation: this.parent.getRelationshipMeta(this.name, model),
+                                    },
+                                };
+                            }),
+                        },
+                    })
+                );
+            }
         }
         if (changes.changed.length) {
-            promise = promise.then(() =>
-                this.execPost({
-                    endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
-                    body: {
-                        data: changes.changed.map((model) => ({
-                            id: model.id,
-                            type: model.type,
-                            meta: {
-                                relation: this.parent.getRelationshipMeta(this.name, model),
+            if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
+                let model = changes.changed[0];
+                promise = promise.then(() =>
+                    this.execPost({
+                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        body: {
+                            data: {
+                                id: model.id,
+                                type: model.type,
+                                meta: {
+                                    relation: this.parent.getRelationshipMeta(this.name, model),
+                                },
                             },
-                        })),
-                    },
-                })
-            );
+                        },
+                        method: 'PATCH',
+                    })
+                );
+            } else {
+                promise = promise.then(() =>
+                    this.execPost({
+                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        body: {
+                            data: changes.changed.map((model) => ({
+                                id: model.id,
+                                type: model.type,
+                                meta: {
+                                    relation: this.parent.getRelationshipMeta(this.name, model),
+                                },
+                            })),
+                        },
+                    })
+                );
+            }
         }
         return promise.then(() => {
             this.resetChanges();

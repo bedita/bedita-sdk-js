@@ -10,13 +10,22 @@ const SCHEMA = {
             type: 'object',
             properties: {
                 name: {
-                    type: 'string',
+                    oneOf: [
+                        { type: 'null' },
+                        { type: 'string', maximum: 255 },
+                    ],
                 },
                 width: {
-                    type: 'number',
+                    oneOf: [
+                        { type: 'null' },
+                        { type: 'number' },
+                    ],
                 },
                 height: {
-                    type: 'number',
+                    oneOf: [
+                        { type: 'null' },
+                        { type: 'number' },
+                    ],
                 },
                 duration: {
                     oneOf: [
