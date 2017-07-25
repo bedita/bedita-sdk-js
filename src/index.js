@@ -37,6 +37,14 @@ export { Session };
 export { Debug };
 
 export class Client extends mix(Factory).with(InjectableMixin) {
+    static init(options) {
+        let client = new this();
+        client.addReadyPromise(
+            client.initialize(options)
+        );
+        return client;
+    }
+
     static get injectors() {
         return {
             url: Url,
@@ -45,15 +53,6 @@ export class Client extends mix(Factory).with(InjectableMixin) {
             session: Session,
             debug: Debug,
         };
-    }
-
-    constructor(options) {
-        super();
-        if (!this.getContext()) {
-            this.addReadyPromise(
-                this.initialize(options)
-            );
-        }
     }
 
     initialize(options) {
