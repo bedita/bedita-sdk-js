@@ -16,6 +16,7 @@ export default {
             include: [
                 'node_modules/@chialab/**/*.js',
                 'node_modules/chialab-*/**/*.js',
+                'src/**/*.js',
             ],
         }),
     ]
