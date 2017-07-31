@@ -6,7 +6,7 @@ const REL_META_KEY = 'relationshipsMeta';
 
 export class BaseModel extends Model {
     initialize(...args) {
-        let ctrRelationships = Object.keys(this.constructor.relationships || {});
+        let ctrRelationships = this.constructor.relationships || {};
         return super.initialize(...args)
             .then(() =>
                 this.setupRelationships(ctrRelationships)
@@ -17,10 +17,9 @@ export class BaseModel extends Model {
         return super.merge(model)
             .then(() => {
                 let rels = model.getRelationships() || {};
-                let keys = Object.keys(rels);
-                return this.setupRelationships(keys)
+                return this.setupRelationships(rels)
                     .then(() => {
-                        keys.forEach((name) => {
+                        Object.keys(rels).forEach((name) => {
                             let collection = this.getRelationship(name);
                             collection.reset();
                             let parentCollection = model.getRelationship(name);
@@ -51,7 +50,7 @@ export class BaseModel extends Model {
         if (res) {
             let relPromise = Promise.resolve();
             if (res.relationships) {
-                relPromise = this.setupRelationships(Object.keys(res.relationships));
+                relPromise = this.setupRelationships(res.relationships);
                 delete res.relationships;
             }
             return relPromise.then(() =>
@@ -124,18 +123,32 @@ export class BaseModel extends Model {
         });
     }
 
-    setupRelationships(rels = []) {
+    setupRelationships(rels = {}) {
         let collections = this.getRelationships() || {};
         return Promise.all(
-            rels.map((name) => {
+            Object.keys(rels).map((name) => {
+                let rel = rels[name];
+                let relPromise = Promise.resolve(collections[name]);
                 if (!collections.hasOwnProperty(name)) {
-                    return this.initClass(RelationshipsCollection, name, this)
+                    relPromise = this.initClass(RelationshipsCollection, name, this)
                         .then((collection) => {
                             collections[name] = collection;
-                            return Promise.resolve();
+                            return Promise.resolve(collection);
                         });
                 }
-                return Promise.resolve();
+                return relPromise.then((collection) => {
+                    if (Array.isArray(rel.data)) {
+                        return Promise.all(
+                            rel.data.map((modelData) =>
+                                collection.model(modelData)
+                                    .then((model) =>
+                                        this.addRelationship(name, model)
+                                    )
+                            )
+                        );
+                    }
+                    return Promise.resolve();
+                });
             })
         ).then(() => {
             this.setRelationships(collections);
