@@ -138,6 +138,7 @@ export class BaseModel extends Model {
                 }
                 return relPromise.then((collection) => {
                     if (Array.isArray(rel.data)) {
+                        collection.fetched = true;
                         return Promise.all(
                             rel.data.map((modelData) =>
                                 collection.model(modelData)
@@ -166,7 +167,7 @@ export class BaseModel extends Model {
 
     fetchRelationship(name, options) {
         let collection = this.getRelationship(name);
-        if (collection && (!options && collection.fetched || this.isNew())) {
+        if (collection && ((!options || Object.keys(options).length === 0) && collection.fetched || this.isNew())) {
             return Promise.resolve(collection);
         }
         if (!this.id) {
