@@ -8,10 +8,24 @@ export class StreamsCollection extends Collection {
         return StreamModel;
     }
 
-    upload(file, media) {
-        return this.factory('api').post(`/streams/upload/${file.name}`, file, {
+    upload(fileContent, type, media) {
+        if (self.File && fileContent instanceof File && typeof type !== 'string') {
+            media = type;
+            type = fileContent.type;
+        }
+        let name;
+        if (typeof media === 'string') {
+            name = media;
+            media = {
+                name,
+            };
+        } else if (media instanceof MediaModel && media.name) {
+            name = media.name;
+        }
+        name = name || `stream_${Date.now()}`;
+        return this.factory('api').post(`/streams/upload/${name}`, fileContent, {
             headers: {
-                'content-type': file.type,
+                'content-type': type,
             },
         }).then((res) =>
             this.model()
@@ -25,21 +39,20 @@ export class StreamsCollection extends Collection {
                         let Collection = this.factory('registry').getCollection(media.type) || MediaCollection;
                         return this.initClass(Collection)
                             .then((collection) => {
-                                let mediaCreation = Promise.resolve(media);
                                 if (!(media instanceof Model)) {
-                                    mediaCreation = collection.model(media)
+                                    return collection.model(media)
+                                        .then((model) =>
+                                            collection.post(model)
+                                                .then(() =>
+                                                    Promise.resolve(model)
+                                                )
+                                        );
                                 }
-                                return mediaCreation
-                                    .then((model) =>
-                                        collection.post(model)
-                                            .then(() => Promise.resolve(model))
-                                    );
+                                return Promise.resolve(media);
                             }).then((mediaModel) => {
-                                streamModel.addRelationship('object', mediaModel);
-                                return streamModel.getRelationship('object').update();
-                            }).then(() =>
-                                Promise.resolve(streamModel)
-                            );
+                                mediaModel.addRelationship('streams', streamModel);
+                                return Promise.resolve(streamModel);
+                            });
                     }
                     return Promise.resolve(streamModel);
                 })

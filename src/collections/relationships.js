@@ -7,16 +7,22 @@ export const RELATIONSHIP_MODES = {
 };
 
 export class RelationshipsCollection extends Collection {
-    get type() {
+    get def() {
         let parent = this.parent;
         let rels = parent.constructor.relationships || {};
-        return rels[this.name] && rels[this.name].types;
+        return rels.hasOwnProperty(this.name) ? rels[this.name] : {};
+    }
+
+    get inverse() {
+        return this.def.inverse;
+    }
+
+    get type() {
+        return this.def.types || [];
     }
 
     get mode() {
-        let parent = this.parent;
-        let rels = parent.constructor.relationships || {};
-        return rels.hasOwnProperty(this.name) ? rels[this.name].mode : RELATIONSHIP_MODES.ONE_TO_MANY;
+        return this.def.mode || RELATIONSHIP_MODES.ONE_TO_MANY;
     }
 
     initialize(name, left) {
@@ -156,7 +162,7 @@ export class RelationshipsCollection extends Collection {
     }
 
     afterFetch(res) {
-        if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
+        if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE && !this.inverse) {
             if (res && res.data) {
                 res.data = [res.data];
             }
@@ -192,11 +198,20 @@ export class RelationshipsCollection extends Collection {
         let ids = [];
         let changes = this.changes;
         let promise = Promise.resolve();
+        let api = this.parent.type;
+        let relationship = this.name;
+        let subject = this.parent.id;
+        if (this.inverse && this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
+            api = this.type[0];
+            relationship = this.inverse;
+        }
         if (changes.removed.length) {
             if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
+                let model = changes.removed[0];
+                subject = model.id;
                 promise = promise.then(() =>
                     this.execPost({
-                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        endpoint: `/${api}/${subject}/relationships/${relationship}`,
                         body: null,
                         method: 'PATCH',
                     })
@@ -204,7 +219,7 @@ export class RelationshipsCollection extends Collection {
             } else {
                 promise = promise.then(() =>
                     this.execPost({
-                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        endpoint: `/${api}/${subject}/relationships/${relationship}`,
                         body: {
                             data: changes.removed.map((model) => {
                                 ids.push(model.id);
@@ -222,13 +237,14 @@ export class RelationshipsCollection extends Collection {
         if (changes.added.length) {
             if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
                 let model = changes.added[0];
+                subject = model.id;
                 promise = promise.then(() =>
                     this.execPost({
-                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        endpoint: `/${api}/${subject}/relationships/${relationship}`,
                         body: {
                             data: {
-                                id: model.id,
-                                type: model.type,
+                                id: this.parent.id,
+                                type: this.parent.type,
                                 meta: {
                                     relation: this.parent.getRelationshipMeta(this.name, model),
                                 },
@@ -240,7 +256,7 @@ export class RelationshipsCollection extends Collection {
             } else {
                 promise = promise.then(() =>
                     this.execPost({
-                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        endpoint: `/${api}/${subject}/relationships/${relationship}`,
                         body: {
                             data: changes.added.map((model) => {
                                 ids.push(model.id);
@@ -260,13 +276,14 @@ export class RelationshipsCollection extends Collection {
         if (changes.changed.length) {
             if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
                 let model = changes.changed[0];
+                subject = model.id;
                 promise = promise.then(() =>
                     this.execPost({
-                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        endpoint: `/${api}/${subject}/relationships/${relationship}`,
                         body: {
                             data: {
-                                id: model.id,
-                                type: model.type,
+                                id: this.parent.id,
+                                type: this.parent.type,
                                 meta: {
                                     relation: this.parent.getRelationshipMeta(this.name, model),
                                 },
@@ -278,7 +295,7 @@ export class RelationshipsCollection extends Collection {
             } else {
                 promise = promise.then(() =>
                     this.execPost({
-                        endpoint: `/${this.parent.type}/${this.parent.id}/relationships/${this.name}`,
+                        endpoint: `/${api}/${subject}/relationships/${relationship}`,
                         body: {
                             data: changes.changed.map((model) => ({
                                 id: model.id,

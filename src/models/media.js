@@ -1,4 +1,5 @@
 import { ObjectModel } from './object.js';
+import { RELATIONSHIP_MODES } from '../collections/relationships.js';
 import './role.js';
 
 const SCHEMA = {
@@ -48,6 +49,8 @@ export class MediaModel extends ObjectModel {
         return {
             streams: {
                 types: ['streams'],
+                mode: RELATIONSHIP_MODES.ONE_TO_ONE,
+                inverse: 'object',
             },
         };
     }
