@@ -40,24 +40,24 @@ export class StreamsCollection extends Collection {
                 )
                 .then((streamModel) => {
                     if (media) {
-                        let Model = this.factory('registry').getModel(media.type) || MediaModel;
-                        let Collection = this.factory('registry').getCollection(media.type) || MediaCollection;
-                        return this.initClass(Collection)
-                            .then((collection) => {
-                                if (!(media instanceof Model)) {
-                                    return collection.model(media)
+                        let mediaPromise = Promise.resolve(media);
+                        if (!(media instanceof MediaModel)) {
+                            let Collection = this.factory('registry').getCollection(media.type) || MediaCollection;
+                            mediaPromise = this.initClass(Collection)
+                                .then((collection) =>
+                                    collection.model(media)
                                         .then((model) =>
                                             collection.post(model)
                                                 .then(() =>
                                                     Promise.resolve(model)
                                                 )
-                                        );
-                                }
-                                return Promise.resolve(media);
-                            }).then((mediaModel) => {
-                                mediaModel.addRelationship('streams', streamModel);
-                                return Promise.resolve(streamModel);
-                            });
+                                        )
+                                )
+                        }
+                        return mediaPromise.then((mediaModel) => {
+                            mediaModel.addRelationship('streams', streamModel);
+                            return Promise.resolve(streamModel);
+                        });
                     }
                     return Promise.resolve(streamModel);
                 })
