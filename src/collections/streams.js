@@ -8,26 +8,17 @@ export class StreamsCollection extends Collection {
         return StreamModel;
     }
 
-    upload(fileContent, type, media) {
-        if (self.File && fileContent instanceof File && typeof type !== 'string') {
-            media = type;
-            type = fileContent.type;
-        }
-        let name;
-        if (typeof media === 'string') {
-            name = media;
-            media = {
-                name,
-            };
-        } else if (media instanceof MediaModel && media.name) {
-            name = media.name;
+    upload(media, fileContent, type, base64) {
+        let name = media.name;
+        if (!type && self.File && fileContent instanceof self.File) {
+            name = name || fileContent.name;
+            type = type || fileContent.type;
         }
         name = name || `stream_${Date.now()}`;
         let headers = {
             'content-type': type,
         };
-        let isBase64 = typeof fileContent === 'string' && !type.match(/^text\//);
-        if (isBase64) {
+        if (base64) {
             headers['content-transfer-encoding'] = 'base64';
         }
         return this.factory('api').post(`/streams/upload/${name}`, fileContent, {
@@ -55,6 +46,9 @@ export class StreamsCollection extends Collection {
                                 )
                         }
                         return mediaPromise.then((mediaModel) => {
+                            if (!mediaModel.name) {
+                                mediaModel.set('name', name, { validate: false });
+                            }
                             mediaModel.addRelationship('streams', streamModel);
                             return Promise.resolve(streamModel);
                         });
