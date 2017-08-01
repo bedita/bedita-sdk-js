@@ -23,10 +23,15 @@ export class StreamsCollection extends Collection {
             name = media.name;
         }
         name = name || `stream_${Date.now()}`;
+        let headers = {
+            'content-type': type,
+        };
+        let isBase64 = typeof fileContent === 'string' && !type.match(/^text\//);
+        if (isBase64) {
+            headers['content-transfer-encoding'] = 'base64';
+        }
         return this.factory('api').post(`/streams/upload/${name}`, fileContent, {
-            headers: {
-                'content-type': type,
-            },
+            headers,
         }).then((res) =>
             this.model()
                 .then((model) =>
