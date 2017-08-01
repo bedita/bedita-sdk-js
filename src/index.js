@@ -20,6 +20,7 @@ export * from './collections/relationships.js';
 export * from './collections/types.js';
 export * from './collections/roles.js';
 export * from './collections/objects.js';
+export * from './collections/trash.js';
 export * from './collections/users.js';
 export * from './collections/streams.js';
 export * from './collections/media.js';
