@@ -1,6 +1,5 @@
 import { ObjectModel } from './object.js';
 import { RELATIONSHIP_MODES } from '../collections/relationships.js';
-import './role.js';
 
 const SCHEMA = {
     type: 'object',

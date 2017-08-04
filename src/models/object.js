@@ -54,6 +54,8 @@ const SCHEMA = {
                         { type: 'null' },
                         { type: 'string', maximum: 255 },
                         { type: 'object' },
+                        { type: 'array' },
+                        { type: 'number' },
                     ],
                 },
                 $modified: {
