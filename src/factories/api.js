@@ -194,7 +194,7 @@ export class Api extends Factory {
     }
 
     types() {
-        return this.get('object_types')
+        return this.get('model/object_types')
             .then((res) => {
                 if (res && res.data) {
                     return Promise.resolve(
