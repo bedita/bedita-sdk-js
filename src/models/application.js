@@ -15,12 +15,14 @@ const SCHEMA = {
         },
         created: {
             oneOf: [
+                { type: 'null' },
                 { type: 'string', format: 'date-time' },
                 { type: 'object', format: 'date-time' },
             ],
         },
         modified: {
             oneOf: [
+                { type: 'null' },
                 { type: 'string', format: 'date-time' },
                 { type: 'object', format: 'date-time' },
             ],
