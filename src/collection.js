@@ -136,7 +136,9 @@ export class Collection extends AjaxCollection {
             return Promise.reject();
         }
         options.endpoint = api;
-        options.body = { data: model.toJSONApi() };
+        if (!options.body) {
+            options.body = { data: model.toJSONApi() };
+        }
         return super.post(model, options)
             .then(() =>
                 model.postRelationships()
