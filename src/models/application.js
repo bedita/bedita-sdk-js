@@ -27,7 +27,7 @@ const SCHEMA = {
                 { type: 'object', format: 'date-time' },
             ],
         },
-        enabled: { type: 'number' },
+        enabled: { type: 'boolean' },
     },
 };
 
