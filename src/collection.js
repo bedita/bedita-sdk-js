@@ -89,16 +89,18 @@ export class Collection extends AjaxCollection {
                         let rels = model.getRelationships() || {};
                         for (let k in rels) {
                             let rel = rels[k];
-                            rel.forEach((relModel) => {
-                                let objData = included.find((entry) =>
-                                    entry.id === relModel.id && entry.type === relModel.type
-                                );
-                                if (objData) {
-                                    promises.push(
-                                        relModel.setFromResponse(Model.clone(objData))
+                            if (Array.isArray(rel)) {
+                                rel.forEach((relModel) => {
+                                    let objData = included.find((entry) =>
+                                        entry.id === relModel.id && entry.type === relModel.type
                                     );
-                                }
-                            });
+                                    if (objData) {
+                                        promises.push(
+                                            relModel.setFromResponse(Model.clone(objData))
+                                        );
+                                    }
+                                });
+                            }
                         }
                     });
                 }
