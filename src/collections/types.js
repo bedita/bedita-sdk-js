@@ -10,4 +10,8 @@ export class TypesCollection extends Collection {
         options.endpoint = `${this.type}?filter[by_relation][name]=${relName}`;
         return super.findAll(options);
     }
+
+    getMinimalPropertiesSet() {
+        return ['id', 'name', 'is_abstract', 'description'];
+    }
 }
