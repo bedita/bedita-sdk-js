@@ -86,7 +86,7 @@ export class Collection extends AjaxCollection {
                 let promises = [];
                 if (included.length) {
                     models.forEach((model) => {
-                        let rels = model.getRelationships();
+                        let rels = model.getRelationships() || {};
                         for (let k in rels) {
                             let rel = rels[k];
                             rel.forEach((relModel) => {
