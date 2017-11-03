@@ -143,7 +143,7 @@ export class Collection extends AjaxCollection {
         }
         return super.post(model, options)
             .then(() =>
-                model.postRelationships()
+                model.postRelationships(options)
             ).then(() => {
                 model.resetChanges();
                 return Promise.resolve(model);

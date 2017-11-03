@@ -14,6 +14,7 @@ export * from './models/stream.js';
 export * from './models/media.js';
 export * from './models/image.js';
 export * from './models/application.js';
+export * from './models/object_type.js';
 
 // COLLECTIONS
 export * from './collection.js';
@@ -26,6 +27,7 @@ export * from './collections/users.js';
 export * from './collections/streams.js';
 export * from './collections/media.js';
 export * from './collections/applications.js';
+export * from './collections/object_types.js';
 
 import { Api } from './factories/api.js';
 import { Url } from './factories/url.js';

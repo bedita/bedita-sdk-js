@@ -99,7 +99,7 @@ export class BaseModel extends Model {
             });
     }
 
-    postRelationships() {
+    postRelationships(options = {}) {
         let collections = this.getRelationships();
         return Promise.all(
             // update sub models
@@ -110,7 +110,7 @@ export class BaseModel extends Model {
                         model.isNew() || model.hasChanges()
                     );
                 return Promise.all(
-                    relationships.map((model) => collection.post(model))
+                    relationships.map((model) => collection.post(model, options))
                 );
             })
         ).then(() => {
