@@ -193,6 +193,11 @@ export class Api extends Factory {
         this.unsetRenewToken();
     }
 
+    /**
+     * get all available object types flatten to their name attribute
+     * 
+     * @returns Promise
+     */
     types() {
         return this.get('model/object_types')
             .then((res) => {

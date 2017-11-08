@@ -198,6 +198,22 @@ export class Collection extends AjaxCollection {
         if (include.length) {
             queryParams.include = include.join(',');
         }
+
+        // check if field filter is set, search if fields are valid 
+        // for model schema and add them to queryParams
+        let fields = [];
+        if (Entity.schema && Entity.schema.properties && options.fields) {
+            let modelFields = Entity.schema.properties;
+            for (let fieldName in modelFields) {
+                if (options.fields.indexOf(fieldName) > -1) {
+                    fields.push(fieldName);
+                }
+            }
+            if (fields.length) {
+                queryParams.fields = fields.join(',');
+            }
+        }
+
         endpoint = url.setSearchParams(endpoint, queryParams);
         this.endpoint = options.endpoint = endpoint;
         internal(this).lastOptions = options;
