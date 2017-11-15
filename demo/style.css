@@ -1,0 +1,11 @@
+body {
+  margin: 0;
+  background-color: rgba(255, 202, 142, 0.253);
+}
+
+.bedita-sdk-demo__main {
+  padding: 15px;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+}
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImRlbW8vZGVtby5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsVUFBVTtFQUNWLDZDQUE2QztDQUM5Qzs7QUFFRDtFQUNFLGNBQWM7RUFDZCwwQ0FBMEM7RUFDMUMsZ0JBQWdCO0NBQ2pCIiwiZmlsZSI6InN0eWxlLmNzcyIsInNvdXJjZXNDb250ZW50IjpbImJvZHkge1xuICBtYXJnaW46IDA7XG4gIGJhY2tncm91bmQtY29sb3I6IHJnYmEoMjU1LCAyMDIsIDE0MiwgMC4yNTMpO1xufVxuXG4uYmVkaXRhLXNkay1kZW1vX19tYWluIHtcbiAgcGFkZGluZzogMTVweDtcbiAgZm9udC1mYW1pbHk6IEhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWY7XG4gIGZvbnQtc2l6ZTogMTZweDtcbn0iXX0= */

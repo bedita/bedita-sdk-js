@@ -1,2 +1,11 @@
 .*
+
+# RNA-STRUCTURE
+.*
+/node_modules
+/coverage
+/test
 rollup.config.js
+sauce.browsers.js
+karma.conf.js
+# RNA-STRUCTURE

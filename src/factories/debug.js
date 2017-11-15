@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
-
-import { Factory } from '@chialab/synapse/src/factory.js';
+import { Factory } from '../factory.js';
 
 let styles = 'font-family: monospace; color: #BBB;';
 
