@@ -4,10 +4,13 @@
 .buildpath
 .settings
 .vscode
+.npmrc
 
 # OS generated files #
+*.DS_Store
 .DS_Store
 .DS_Store?
+.tmp
 ._*
 .Spotlight-V100
 .Trashes
@@ -16,10 +19,21 @@ ehthumbs.db
 Thumbs.db
 
 # App
-npm-debug.log
 /node_modules
 /dist
+/coverage
+/docs
+/reports
+/dist
+/wiki
+/cdn
 
 # RNA-STRUCTURE
 
 # RNA-STRUCTURE
+
+# LOGS
+
+npm-debug.log
+yarn-error.log
+lerna-debug.log

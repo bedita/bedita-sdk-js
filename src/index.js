@@ -12,13 +12,13 @@ export * from './collection.js';
 import { Api } from './factories/api.js';
 import { Url } from './factories/url.js';
 import { ModelDesign } from './factories/model-design.js';
-import { Session } from './factories/session.js';
+import { UserAuth } from './factories/user-auth.js';
 import { Debug } from './factories/debug.js';
 import { Store } from './factories/store.js';
 
 export { Api };
 export { Url };
 export { ModelDesign };
-export { Session };
+export { UserAuth };
 export { Debug };
 export { Store };

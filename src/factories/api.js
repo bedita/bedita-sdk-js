@@ -6,4 +6,9 @@ import { Factory } from '../factory.js';
  * 
  */
 export class Api extends Factory {
+
+    // objects types??
+
+    // check response err.error.status & error.code
+
 }

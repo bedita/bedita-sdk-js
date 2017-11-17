@@ -1,10 +1,10 @@
 import { Factory } from '../factory.js';
 
 /**
- * 
+ * handle logged user (wrap Api auth methods).
  * 
  */
-export class Session extends Factory {
+export class UserAuth extends Factory {
     getUser() {
         
     }
