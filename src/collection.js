@@ -167,17 +167,17 @@ export class Collection extends AjaxCollection {
         if (options.sort) {
             queryParams.sort = options.sort;
         }
-        if (options.page) {
+        if (typeof options.page !== 'undefined') {
             queryParams.page = options.page;
         }
-        if (options.pageSize) {
+        if (typeof options.pageSize !== 'undefined') {
             queryParams.page_size = options.pageSize;
+        }
+        if (typeof options.search !== 'undefined') {
+            queryParams.q = options.search;
         }
         if (options.filter) {
             queryParams.filter = options.filter;
-        }
-        if (options.search) {
-            queryParams.q = options.search;
         }
         let include = [];
         if (Entity.relationships) {
