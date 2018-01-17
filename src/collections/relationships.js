@@ -35,7 +35,7 @@ export class RelationshipsCollection extends Collection {
                 this.parent.on('relparams:change', (changed) => {
                     if (changed.name === this.name) {
                         this.updateRelationshipsChanges(changed.right, 'changed');
-                        this.trigger('change');
+                        this.trigger('change', { type: 'update' });
                     }
                 });
                 this.on('change', (changes) => {
