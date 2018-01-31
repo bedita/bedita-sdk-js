@@ -34,13 +34,13 @@ const SCHEMA = {
                 description: {
                     oneOf: [
                         { type: 'null' },
-                        { type: 'string' },
+                        { type: 'string', contentMediaType: 'text/html' },
                     ],
                 },
                 body: {
                     oneOf: [
                         { type: 'null' },
-                        { type: 'string' },
+                        { type: 'string', contentMediaType: 'text/html' },
                     ],
                 },
                 lang: {
