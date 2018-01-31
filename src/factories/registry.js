@@ -15,6 +15,7 @@ export class Registry extends Factory {
         this.models = {};
         this.collections = {};
         this.modelQueue = {};
+        this.collectionQueue = {};
         return super.initialize(options)
             .then(() => {
                 let collections = (this.constructor.collections || []);
@@ -63,12 +64,16 @@ export class Registry extends Factory {
         if (this.hasCollection(type)) {
             return Promise.resolve(this.collections[type]);
         }
-        return this.getModel(type)
+        if (this.collectionQueue[type]) {
+            return this.collectionQueue[type];
+        }
+        this.collectionQueue[type] = this.getModel(type)
             .then((Model) => {
                 let TypedCollection = BaseCollection.create(Model);
                 this.registerCollection(type, TypedCollection);
                 return Promise.resolve(TypedCollection);
             });
+        return this.collectionQueue[type];
     }
 
     hasCollection(type) {
