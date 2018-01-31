@@ -58,17 +58,6 @@ const SCHEMA = {
                         { type: 'number' },
                     ],
                 },
-                $modified: {
-                    oneOf: [
-                        { type: 'null' },
-                        { type: 'number' },
-                        { type: 'string', format: 'date-time' },
-                        { type: 'object', format: 'date-time' },
-                    ],
-                },
-                $deleted: {
-                    type: 'boolean',
-                },
             },
         },
     },

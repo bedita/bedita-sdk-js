@@ -50,18 +50,18 @@ export class Model extends AjaxModel {
 
     delete() {
         this.reset(true);
-        this.set('$deleted', true);
+        this.tickDeleted();
         this.trigger('deleted');
     }
 
     setChanges(...args) {
         super.setChanges(...args);
-        this.set('$modified', Date.now(), { skipChanges: true });
+        this.tickModified();
     }
 
     resetChanges() {
         super.resetChanges();
-        this.set('$modified', new Date(this.metadata && this.metadata.modified || 0).getTime(), { skipChanges: true });
+        this.tickModified(this.metadata && this.metadata.modified || 0);
     }
 
     hasLocalChanges() {
@@ -117,12 +117,20 @@ export class Model extends AjaxModel {
                     validate: false,
                     skipChanges: true,
                 });
-                this.set('$modified', this.metadata && this.metadata.modified, { skipChanges: true });
+                this.tickModified(this.metadata && this.metadata.modified || 0);
                 delete res.meta;
             }
             delete res.links;
         }
         return super.setFromResponse(res);
+    }
+
+    tickModified(date = Date.now()) {
+        this.set('$modified', new Date(date).getTime(), { skipChanges: true, validate: false });
+    }
+
+    tickDeleted() {
+        this.set('$deleted', true, { skipChanges: true, validate: false });
     }
 
     toJSONApi(stripUndefined, onlyChanges) {
