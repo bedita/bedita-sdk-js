@@ -69,10 +69,10 @@ export class RelationshipsCollection extends Collection {
 
     getMinimalPropertiesSet() {
         if (this.type && this.type.length === 1) {
-            let Ctr = this.factory('registry').getCollection(this.type[0]);
-            if (Ctr) {
-                return Ctr.prototype.getMinimalPropertiesSet.call(this);
-            }
+            return this.factory('registry').getCollection(this.type[0])
+                .then((Ctr) =>
+                    Ctr.prototype.getMinimalPropertiesSet.call(this)
+                );
         }
         return super.getMinimalPropertiesSet();
     }
@@ -96,12 +96,16 @@ export class RelationshipsCollection extends Collection {
     fetchRelationableObjects() {
         return this.fetchRelationableTypes()
             .then((types) => {
-                let Ctr = Collection;
+                let resolveCollection;
                 if (types.length === 1) {
                     types = types[0];
-                    Ctr = this.factory('registry').getCollection(types) || Ctr;
+                    resolveCollection = this.factory('registry').getCollection(types)
+                        .catch(() => Collection);
+                } else {
+                    resolveCollection = Promise.resolve(Collection);
                 }
-                return this.initClass(Ctr)
+                return resolveCollection
+                    .then((Ctr) => this.initClass(Ctr))
                     .then((collection) => {
                         let endpoint = Array.isArray(types) ?
                             `/objects?${types.map((type) => `filter[type][]=${type}`).join('&')}` :

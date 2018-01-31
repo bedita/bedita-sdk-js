@@ -12,6 +12,6 @@ export class TypesCollection extends Collection {
     }
 
     getMinimalPropertiesSet() {
-        return ['id', 'name', 'is_abstract', 'description'];
+        return Promise.resolve(['id', 'name', 'is_abstract', 'description']);
     }
 }

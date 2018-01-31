@@ -10,8 +10,8 @@ export class Session extends Factory {
             return Promise.reject();
         }
         if (!internal(this).userPromise) {
-            const Collection = this.factory('registry').getCollection('users');
-            internal(this).userPromise = this.initClass(Collection)
+            internal(this).userPromise = this.factory('registry').getCollection('users')
+                .then((Collection) => this.initClass(Collection))
                 .then((collection) =>
                     this.factory('api').me()
                         .then((res) =>
@@ -47,8 +47,8 @@ export class Session extends Factory {
 
     onLoginResponse(res) {
         if (res.meta) {
-            const Collection = this.factory('registry').getCollection('users');
-            return this.initClass(Collection)
+            return this.factory('registry').getCollection('users')
+                .then((Collection) => this.initClass(Collection))
                 .then((collection) =>
                     collection.model()
                         .then((model) =>

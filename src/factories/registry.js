@@ -1,4 +1,6 @@
 import { Factory } from '@chialab/synapse/src/factory.js';
+import { Model } from '../model';
+import { Collection } from '../collection';
 
 export class Registry extends Factory {
     static get models() {
@@ -12,6 +14,7 @@ export class Registry extends Factory {
     initialize(options = {}) {
         this.models = {};
         this.collections = {};
+        this.modelQueue = {};
         return super.initialize(options)
             .then(() => {
                 let collections = (this.constructor.collections || []);
@@ -32,11 +35,20 @@ export class Registry extends Factory {
         this.models[Model.prototype.type || Model.type] = Model;
     }
 
-    getModel(type) {
+    getModel(type, BaseModel = Model) {
         if (this.hasModel(type)) {
-            return this.models[type];
+            return Promise.resolve(this.models[type]);
         }
-        this.factory('debug').warn(`registry -> Missing Collection for ${type}`);
+        if (this.modelQueue[type]) {
+            return this.modelQueue[type];
+        }
+        this.modelQueue[type] = this.factory('api').get(`/model/schema/${type}`)
+            .then((data) => {
+                let TypedModel = BaseModel.create(type, data);
+                this.registerModel(TypedModel);
+                return Promise.resolve(TypedModel);
+            });
+        return this.modelQueue[type];
     }
 
     hasModel(type) {
@@ -47,11 +59,16 @@ export class Registry extends Factory {
         this.collections[Collection.prototype.type || Collection.type] = Collection;
     }
 
-    getCollection(type) {
+    getCollection(type, BaseCollection = Collection) {
         if (this.hasCollection(type)) {
-            return this.collections[type];
+            return Promise.resolve(this.collections[type]);
         }
-        this.factory('debug').warn(`registry -> Missing Collection for ${type}`);
+        return this.getModel(type)
+            .then((Model) => {
+                let TypedCollection = BaseCollection.create(Model);
+                this.registerCollection(type, TypedCollection);
+                return Promise.resolve(TypedCollection);
+            });
     }
 
     hasCollection(type) {

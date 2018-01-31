@@ -7,6 +7,6 @@ export class ApplicationsCollection extends Collection {
     }
 
     getMinimalPropertiesSet() {
-        return ['id', 'metadata.api_key', 'name', 'description'];
+        return Promise.resolve(['id', 'metadata.api_key', 'name', 'description']);
     }
 }

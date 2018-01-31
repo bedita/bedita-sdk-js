@@ -7,6 +7,6 @@ export class RolesCollection extends Collection {
     }
 
     getMinimalPropertiesSet() {
-        return ['id', 'name'];
+        return Promise.resolve(['id', 'name']);
     }
 }

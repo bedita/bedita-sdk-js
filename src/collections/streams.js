@@ -33,8 +33,9 @@ export class StreamsCollection extends Collection {
                     if (media) {
                         let mediaPromise = Promise.resolve(media);
                         if (!(media instanceof MediaModel)) {
-                            let Collection = this.factory('registry').getCollection(media.type) || MediaCollection;
-                            mediaPromise = this.initClass(Collection)
+                            return this.factory('registry').getCollection(media.type)
+                                .catch(() => MediaCollection)
+                                .then((Collection) => this.initClass(Collection))
                                 .then((collection) =>
                                     collection.model(media)
                                         .then((model) =>
@@ -43,7 +44,7 @@ export class StreamsCollection extends Collection {
                                                     Promise.resolve(model)
                                                 )
                                         )
-                                )
+                                );
                         }
                         return mediaPromise.then((mediaModel) => {
                             if (!mediaModel.name) {
@@ -59,6 +60,6 @@ export class StreamsCollection extends Collection {
     }
 
     getMinimalPropertiesSet() {
-        return ['metadata.url', 'file_name', 'mime_type', 'metadata.version'];
+        return Promise.resolve(['metadata.url', 'file_name', 'mime_type', 'metadata.version']);
     }
 }

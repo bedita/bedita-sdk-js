@@ -19,12 +19,14 @@ export class Collection extends AjaxCollection {
         return this.constructor.Model.prototype.type || this.constructor.Model.type;
     }
 
-    model(data, Entity) {
-        if (!Entity && data && data.type) {
-            Entity = this.factory('registry').getModel(data.type);
+    model(data, EntityModel) {
+        let resolveModel;
+        if (!EntityModel && data && data.type) {
+            resolveModel = this.factory('registry').getModel(data.type, this.constructor.Model);
+        } else {
+            resolveModel = Promise.resolve(EntityModel || this.constructor.Model);
         }
-        Entity = Entity || this.constructor.Model;
-        return super.model(data, Entity);
+        return resolveModel.then((Model) => super.model(data, Model));
     }
 
     execFetch(options = {}) {
@@ -37,8 +39,8 @@ export class Collection extends AjaxCollection {
         options = Collection.clone(options);
         let api = options.endpoint;
         let id = model.get('id');
+        let Entity = options.Model || this.constructor.Model;
         if (!api && id) {
-            let Entity = options.Model || this.constructor.Model;
             api = `${Entity.prototype.type || Entity.type}/${id}`;
         }
         if (!api) {
@@ -51,23 +53,23 @@ export class Collection extends AjaxCollection {
                     .then((res) =>
                         this.afterFetch(res)
                     )
-                    .then((data) => {
-                        let modelConvertion = Promise.resolve(model);
-                        if (data.type) {
-                            const Model = this.factory('registry').getModel(data.type);
-                            if (Model && !(model instanceof Model)) {
-                                modelConvertion = this.initClass(Model);
-                            }
-                        }
-                        return modelConvertion
+                    .then((data) =>
+                        this.factory('registry').getModel(data.type, this.constructor.Model)
+                            .catch(() => Promise.resolve(Entity))
+                            .then((Model) => {
+                                if (Model && !(model instanceof Model)) {
+                                    return this.initClass(Model);
+                                }
+                                return Promise.resolve(model);
+                            })
                             .then((convertedModel) => {
                                 convertedModel.resetChanges();
                                 return convertedModel.setFromResponse(data);
                             })
                             .catch((err) => {
                                 this.factory('debug').error('model convertion ->', err);
-                            });
-                    })
+                            })
+                    )
             );
     }
 
@@ -300,7 +302,7 @@ export class Collection extends AjaxCollection {
     }
 
     getMinimalPropertiesSet() {
-        return ['id', 'type', 'uname', 'title', 'metadata.created', 'metadata.modified'];
+        return Promise.resolve(['id', 'type', 'uname', 'title', 'metadata.created', 'metadata.modified']);
     }
 
     /**

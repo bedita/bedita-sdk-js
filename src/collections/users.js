@@ -7,6 +7,6 @@ export class UsersCollection extends Collection {
     }
 
     getMinimalPropertiesSet() {
-        return ['id', 'email', 'title', 'username', 'metadata.last_login'];
+        return Promise.resolve(['id', 'email', 'title', 'username', 'metadata.last_login']);
     }
 }

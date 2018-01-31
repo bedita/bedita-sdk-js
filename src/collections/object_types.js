@@ -18,10 +18,10 @@ export class ObjectTypesCollection extends Collection {
     /**
      * Return minimal properties set for index pages
      * 
-     * @return {Array} properties set
+     * @return {Promise<Array>} properties set
      */
     getMinimalPropertiesSet() {
-        return ['id', 'name', 'is_abstract', 'description'];
+        return Promise.resolve(['id', 'name', 'is_abstract', 'description']);
     }
 
     /**
@@ -46,8 +46,6 @@ export class ObjectTypesCollection extends Collection {
      */
     filterTypes(options = {}) {
         return this.findAll(options)
-            .then(() => { 
-                return this.array; 
-            });
+            .then(() => this.array);
     }
 }
