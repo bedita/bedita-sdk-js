@@ -15,12 +15,13 @@ npm install bedita-sdk-js
 ### Requirements
 
 * [Node](https://nodejs.org) (>= 6.0.0)
+* [Yarn](https://yarnpkg.com/)
 
 ### Build
 
 ```sh
-npm install
-npm run build
+yarn install
+yarn run build
 ```
 
 ## Licensing
