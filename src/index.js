@@ -94,4 +94,28 @@ export class Client extends mix(Factory).with(InjectableMixin) {
     registerCollection(Ctr) {
         this.factory('registry').registerCollection(Ctr);
     }
+
+    initCollection(type) {
+        let resolveCollectionCtr;
+        if (typeof type === 'string') {
+            // get or generate the collection
+            resolveCollectionCtr = this.getCollection(type);
+        } else if (typeof type === 'function') {
+            // already a Class contrusctor
+            resolveCollectionCtr = Promise.resolve(type);
+        }
+        return resolveCollectionCtr.then((Collection) => this.initClass(Collection));
+    }
+
+    initModel(type) {
+        let resolveModelCtr;
+        if (typeof type === 'string') {
+            // get or generate the model
+            resolveModelCtr = this.getModel(type);
+        } else if (typeof type === 'function') {
+            // already a Class contrusctor
+            resolveModelCtr = Promise.resolve(type);
+        }
+        return resolveModelCtr.then((Model) => this.initClass(Model));
+    }
 }
