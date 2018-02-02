@@ -15,8 +15,8 @@
     tv4 "^1.2.7"
 
 "@chialab/synapse@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/@chialab/synapse/-/synapse-2.0.0.tgz#e7d3bf7e35fcadcb085d162cef4d91dbcc6c1e7e"
+  version "2.0.1"
+  resolved "https://registry.npmjs.org/@chialab/synapse/-/synapse-2.0.1.tgz#1c874f1f7e6068ada22a5b3cb0c2433d6104a304"
   dependencies:
     "@chialab/router" "^1.0.1"
     "@chialab/schema-model" "^1.3.2"

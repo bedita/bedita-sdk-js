@@ -33,7 +33,7 @@ export class StreamsCollection extends Collection {
                     if (media) {
                         let mediaPromise = Promise.resolve(media);
                         if (!(media instanceof MediaModel)) {
-                            return this.factory('registry').getCollection(media.type)
+                            return this.factory('model').getCollection(media.type)
                                 .catch(() => MediaCollection)
                                 .then((Collection) => this.initClass(Collection))
                                 .then((collection) =>

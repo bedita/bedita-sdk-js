@@ -9,57 +9,17 @@ const SCHEMA = {
     type: 'object',
     properties: {
         id: { type: 'string', maximum: 255 },
-        parent_id: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string' },
-            ],
-        },
-        tree_left: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string' },
-            ],
-        },
-        tree_right: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string' },
-            ],
-        },
-        is_abstract: {
-            oneOf: [
-                { type: 'boolean' },
-            ],
-        },
-        singular: { type: 'string', maximum: 50 },
+        type: { type: 'string', maximum: 255 },
         name: { type: 'string', maximum: 50 },
+        singular: { type: 'string', maximum: 50 },
+        is_abstract: { type: 'boolean' },
         description: {
             oneOf: [
                 { type: 'null' },
                 { type: 'string' },
             ],
         },
-        plugin: { type: 'string', maximum: 255 },
-        model: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string', maximum: 50 },
-            ],
-        },
-        association: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string' },
-            ],
-        },
         hidden: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string' },
-            ],
-        },
-        table: {
             oneOf: [
                 { type: 'null' },
                 { type: 'string' },
@@ -105,5 +65,69 @@ export class ObjectTypeModel extends BaseModel {
      */
     postRelationships() {
         return Promise.resolve();
+    }
+
+    /**
+     * Retrieve the parent ObjectType.
+     * @return {Promise<ObjectType>}
+     */
+    getParentModel() {
+        if (this.parent_name) {
+            return this.factory('model').getObjectType(this.parent_name);
+        }
+        return Promise.reject('missing `parent_name`');
+    }
+
+    /**
+     * Retrieve a full list of properties.
+     * @return {Promise<PropertiesCollection>}
+     */
+    getProperties() {
+        return this.factory('model').getPropertiesForType(this.name);
+    }
+
+    /**
+     * Retrieve static ObjectType properties.
+     * @return {Promise<PropertiesCollection>}
+     */
+    getStaticProperties() {
+        return this.factory('model').getStaticPropertiesForType(this.name);
+    }
+
+    /**
+     * Retrieve dynamic ObjectType properties.
+     * @return {Promise<PropertiesCollection>}
+     */
+    getDynamicProperties() {
+        return this.factory('model').getDynamicPropertiesForType(this.name)
+            .then((collection) => {
+                this.on('change', () => {
+                    // sync object type `name` with property' `object_type_name`
+                    collection.forEach((model) => {
+                        model.set('object_type_name', this.name, { validate: false });
+                    });
+                });
+                return Promise.resolve(collection);
+            });
+    }
+
+    /**
+     * Create a property for object type.
+     * @param {Object} data Property data.
+     * @return {Promise<PropertyModel>}
+     */
+    createProperty(data = {}) {
+        return this.factory('model').initModel('properties')
+            .then((model) => {
+                if (this.name) {
+                    data.object_type_name = this.name;
+                }
+                model.set(data, { validate: false });
+                this.on('change', () => {
+                    // sync object type `name` with property' `object_type_name`
+                    model.set('object_type_name', this.name, { validate: false });
+                });
+                return Promise.resolve(model);
+            });
     }
 }

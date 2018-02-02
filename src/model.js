@@ -48,6 +48,10 @@ export class Model extends AjaxModel {
         return !this.id;
     }
 
+    isDeleted() {
+        return !!this.$deleted;
+    }
+
     delete() {
         this.reset(true);
         this.tickDeleted();
@@ -130,7 +134,7 @@ export class Model extends AjaxModel {
     }
 
     tickDeleted() {
-        this.set('$deleted', true, { skipChanges: true, validate: false });
+        this.set('$deleted', true, { skipChanges: false, validate: false });
     }
 
     toJSONApi(stripUndefined, onlyChanges) {

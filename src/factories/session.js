@@ -10,7 +10,7 @@ export class Session extends Factory {
             return Promise.reject();
         }
         if (!internal(this).userPromise) {
-            internal(this).userPromise = this.factory('registry').getCollection('users')
+            internal(this).userPromise = this.factory('model').getCollection('users')
                 .then((Collection) => this.initClass(Collection))
                 .then((collection) =>
                     this.factory('api').me()
@@ -47,7 +47,7 @@ export class Session extends Factory {
 
     onLoginResponse(res) {
         if (res.meta) {
-            return this.factory('registry').getCollection('users')
+            return this.factory('model').getCollection('users')
                 .then((Collection) => this.initClass(Collection))
                 .then((collection) =>
                     collection.model()
