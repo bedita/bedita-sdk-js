@@ -172,7 +172,7 @@ export class ModelFactory extends Factory {
     }
 
     /**
-     * Fecth all object types.
+     * Fetch all object types.
      * @return {Promise<ObjectTypesCollection>}
      */
     getObjectTypes() {
@@ -184,10 +184,10 @@ export class ModelFactory extends Factory {
     }
 
     /**
-     * Fecth abstract object types.
+     * Fetch abstract object types.
      * @return {Promise<ObjectTypesCollection>}
      */
-    getAbastractObjectTypes() {
+    getAbstractObjectTypes() {
         return this.initClass(ObjectTypesCollection)
             .then((collection) =>
                 collection.findAll({
