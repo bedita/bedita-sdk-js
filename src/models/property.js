@@ -1,7 +1,6 @@
 import { BaseModel } from './base.js';
 
 const SCHEMA = {
-    definitions: BaseModel.schema.definitions,
     type: 'object',
     properties: {
         id: { type: 'string', maximum: 255 },
@@ -14,9 +13,6 @@ const SCHEMA = {
                 { type: 'null' },
                 { type: 'string' },
             ],
-        },
-        metadata: {
-            $ref: '#/definitions/metadata',
         },
     },
     required: ['name', 'property_type_name', 'object_type_name'],

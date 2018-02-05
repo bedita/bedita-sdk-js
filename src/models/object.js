@@ -2,75 +2,155 @@ import { BaseModel } from './base.js';
 
 const SCHEMA = {
     definitions: {
-        metadata: BaseModel.schema.definitions.metadata,
         object: {
+            $schema: 'http://json-schema.org/draft-06/schema#',
             type: 'object',
             properties: {
-                id: {
-                    oneOf: [
-                        { type: 'null' },
-                        { type: 'string', maximum: 255 },
-                    ],
+                publish_end: {
+                    oneOf: [{
+                        type: 'null',
+                    }, {
+                        type: 'string',
+                        format: 'date-time',
+                    }],
+                    $id: '/properties/publish_end',
+                    title: 'Publish End',
+                    description: 'publish until this date',
                 },
-                type: {
-                    type: 'string',
-                    maximum: 255,
-                },
-                uname: {
-                    oneOf: [
-                        { type: 'null' },
-                        { type: 'string', maximum: 255 },
-                    ],
-                },
-                title: {
-                    oneOf: [
-                        { type: 'null' },
-                        { type: 'string', maximum: 255 },
-                    ],
-                },
-                status: {
-                    options: ['on', 'draft', 'off'],
-                },
-                description: {
-                    oneOf: [
-                        { type: 'null' },
-                        { type: 'string', contentMediaType: 'text/html' },
-                    ],
+                publish_start: {
+                    oneOf: [{
+                        type: 'null',
+                    }, {
+                        type: 'string',
+                        format: 'date-time',
+                    }],
+                    $id: '/properties/publish_start',
+                    title: 'Publish Start',
+                    description: 'publish from this date on',
                 },
                 body: {
-                    oneOf: [
-                        { type: 'null' },
-                        { type: 'string', contentMediaType: 'text/html' },
-                    ],
+                    oneOf: [{
+                        type: 'null',
+                    }, {
+                        type: 'string',
+                        contentMediaType: 'text/html',
+                    }],
+                    $id: '/properties/body',
+                    title: 'Body',
+                    description: '',
                 },
-                lang: {
-                    oneOf: [
-                        { type: 'null' },
-                        { type: 'string', maximum: 255 },
-                    ],
+                created: {
+                    type: 'string',
+                    format: 'date-time"',
+                    $id: '/properties/created',
+                    title: 'Created',
+                    description: 'creation date',
+                    readOnly: true,
+                },
+                title: {
+                    oneOf: [{
+                        type: 'null',
+                    }, {
+                        type: 'string',
+                        contentMediaType: 'text/html',
+                    }],
+                    $id: '/properties/title',
+                    title: 'Title',
+                    description: '',
+                },
+                modified: {
+                    type: 'string',
+                    format: 'date-time',
+                    $id: '/properties/modified',
+                    title: 'Modified',
+                    description: 'last modification date',
+                    readOnly: true,
                 },
                 extra: {
-                    oneOf: [
-                        { type: 'null' },
-                        { type: 'string', maximum: 255 },
-                        { type: 'object' },
-                        { type: 'array' },
-                        { type: 'number' },
-                    ],
+                    oneOf: [{
+                        type: 'null',
+                    }, {
+                        type: 'object',
+                    }],
+                    $id: '/properties/extra',
+                    title: 'Extra',
+                    description: 'object data extensions (JSON format)',
+                },
+                created_by: {
+                    type: 'integer',
+                    $id: '/properties/created_by',
+                    title: 'Created By',
+                    description: 'user who created object',
+                    readOnly: true,
+                },
+                modified_by: {
+                    type: 'integer',
+                    $id: '/properties/modified_by',
+                    title: 'Modified By',
+                    description: 'last user to modify object',
+                    readOnly: true,
+                },
+                locked: {
+                    type: 'boolean',
+                    $id: '/properties/locked',
+                    title: 'Locked',
+                    description: 'locked flag: some fields (status, uname,...) cannot be changed',
+                    readOnly: true,
+                    default: false,
+                },
+                status: {
+                    type: 'string',
+                    enum: ['on', 'off', 'draft'],
+                    $id: '/properties/status',
+                    title: 'Status',
+                    description: 'object status: on, draft, off',
+                    default: 'draft',
+                },
+                lang: {
+                    oneOf: [{
+                        type: 'null',
+                    }, {
+                        type: 'string',
+                    }],
+                    $id: '/properties/lang',
+                    title: 'Lang',
+                    description: 'language used, ISO 639-3 code',
+                },
+                published: {
+                    oneOf: [{
+                        type: 'null',
+                    }, {
+                        type: 'string',
+                        format: 'date-time',
+                    }],
+                    $id: '/properties/published',
+                    title: 'Published',
+                    description: 'publication date, status set to ON',
+                    readOnly: true,
+                },
+                description: {
+                    oneOf: [{
+                        type: 'null',
+                    }, {
+                        type: 'string',
+                        contentMediaType: 'text/html',
+                    }],
+                    $id: '/properties/description',
+                    title: 'Description',
+                    description: '',
+                },
+                uname: {
+                    type: 'string',
+                    $id: '/properties/uname',
+                    title: 'Uname',
+                    description: 'unique and url friendly resource name (slug)',
+                    maxLength: 255,
                 },
             },
         },
     },
     allOf: [
         { $ref: '#/definitions/object' },
-        {
-            type: 'object',
-            properties: {
-                metadata: {
-                    $ref: '#/definitions/metadata',
-                },
-            },
-        },
     ],
 };
 

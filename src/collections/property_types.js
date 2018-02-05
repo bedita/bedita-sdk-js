@@ -15,6 +15,10 @@ export class PropertyTypesCollection extends Collection {
         return PropertyTypeModel;
     }
 
+    /**
+     * The endpoint for PropertyTypes.
+     * @type {String}
+     */
     get defaultEndpoint() {
         return '/model/property_types';
     }

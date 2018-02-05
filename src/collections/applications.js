@@ -7,6 +7,14 @@ export class ApplicationsCollection extends Collection {
     }
 
     getMinimalPropertiesSet() {
-        return Promise.resolve(['id', 'metadata.api_key', 'name', 'description']);
+        return Promise.resolve(['id', 'api_key', 'name', 'description']);
+    }
+
+    /**
+     * The endpoint for Applications.
+     * @type {String}
+     */
+    get defaultEndpoint() {
+        return '/admin/applications';
     }
 }

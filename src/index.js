@@ -5,7 +5,6 @@ import { InjectableMixin } from '@chialab/synapse/src/mixins/injectable.js';
 
 // MODELS
 export * from './model.js';
-export * from './models/date_range.js';
 import { ObjectModel } from './models/object.js';
 import { RoleModel } from './models/role.js';
 import { UserModel } from './models/user.js';

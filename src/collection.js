@@ -254,10 +254,8 @@ export class Collection extends AjaxCollection {
         let endpoint = this.endpoint;
         if (endpoint) {
             let sort = this.factory('url').getSearchParam(endpoint, 'sort');
-            let metaField = field.replace('metadata.', '');
             if (sort) {
-                return sort === field || sort === `-${field}` ||
-                    sort === metaField || sort === `-${metaField}`;
+                return sort === field || sort === `-${field}`;
             }
         }
         return false;
@@ -306,7 +304,7 @@ export class Collection extends AjaxCollection {
     }
 
     getMinimalPropertiesSet() {
-        return Promise.resolve(['id', 'type', 'uname', 'title', 'metadata.created', 'metadata.modified']);
+        return Promise.resolve(['id', 'type', 'uname', 'title', 'created', 'modified']);
     }
 
     /**

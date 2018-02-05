@@ -5,8 +5,8 @@ const SCHEMA = {
     type: 'object',
     properties: {
         id: { type: 'string', maximum: 255 },
-        api_key: { type: 'string', maximum: 255 },
         name: { type: 'string', maximum: 255 },
+        api_key: { type: 'string', maximum: 255, readOnly: true },
         description: {
             oneOf: [
                 { type: 'null' },
@@ -19,6 +19,7 @@ const SCHEMA = {
                 { type: 'string', format: 'date-time' },
                 { type: 'object', format: 'date-time' },
             ],
+            readOnly: true,
         },
         modified: {
             oneOf: [
@@ -26,6 +27,7 @@ const SCHEMA = {
                 { type: 'string', format: 'date-time' },
                 { type: 'object', format: 'date-time' },
             ],
+            readOnly: true,
         },
         enabled: { type: 'boolean' },
     },

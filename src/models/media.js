@@ -2,8 +2,8 @@ import { ObjectModel } from './object.js';
 import { RELATIONSHIP_MODES } from '../collections/relationships.js';
 
 const SCHEMA = {
-    type: 'object',
     definitions: ObjectModel.schema.definitions,
+    type: 'object',
     allOf: [
         { $ref: '#/definitions/object' },
         {
@@ -33,7 +33,6 @@ const SCHEMA = {
                         { type: 'number' },
                     ],
                 },
-                metadata: { $ref: '#/definitions/metadata' },
             },
         },
     ],

@@ -15,6 +15,10 @@ export class ObjectTypesCollection extends Collection {
         return ObjectTypeModel;
     }
 
+    /**
+     * The endpoint for ObjectTypes.
+     * @type {String}
+     */
     get defaultEndpoint() {
         return '/model/object_types';
     }

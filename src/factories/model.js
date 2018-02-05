@@ -108,7 +108,7 @@ export class ModelFactory extends Factory {
         this.collectionQueue[type] = this.getModel(type)
             .then((Model) => {
                 let TypedCollection = BaseCollection.create(Model);
-                this.registerCollection(type, TypedCollection);
+                this.registerCollection(TypedCollection);
                 return Promise.resolve(TypedCollection);
             });
         return this.collectionQueue[type];

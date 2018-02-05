@@ -1,5 +1,4 @@
 import { AjaxModel } from '@chialab/synapse/src/models/ajax.js';
-import SchemaModel from '@chialab/schema-model';
 import tv4 from 'tv4';
 
 tv4.addFormat('date-time', (data) => {
@@ -13,20 +12,16 @@ tv4.addFormat('date-time', (data) => {
 });
 
 const SCHEMA = {
-    definitions: {
-        metadata: {
-            type: 'object',
-            additionalProperties: true,
-            properties: {
-                created: {
-                    type: 'string',
-                    format: 'date-time',
-                },
-                modified: {
-                    type: 'string',
-                    format: 'date-time',
-                },
-            },
+    type: 'object',
+    additionalProperties: true,
+    properties: {
+        created: {
+            type: 'string',
+            format: 'date-time',
+        },
+        modified: {
+            type: 'string',
+            format: 'date-time',
         },
     },
 };
@@ -65,11 +60,11 @@ export class Model extends AjaxModel {
 
     resetChanges() {
         super.resetChanges();
-        this.tickModified(this.metadata && this.metadata.modified || 0);
+        this.tickModified(this.modified || 0);
     }
 
     hasLocalChanges() {
-        let remote = new Date(this.metadata && this.metadata.modified || 0);
+        let remote = new Date(this.modified || 0);
         let current = new Date(this.get('$modified'));
         return current > remote;
     }
@@ -116,12 +111,11 @@ export class Model extends AjaxModel {
                 delete res.attributes;
             }
             if (res.meta) {
-                let old = this.get('metadata') || {};
-                this.set('metadata', SchemaModel.merge(old, res.meta), {
+                this.set(res.meta, {
                     validate: false,
                     skipChanges: true,
                 });
-                this.tickModified(this.metadata && this.metadata.modified || 0);
+                this.tickModified(this.modified || 0);
                 delete res.meta;
             }
             delete res.links;
@@ -140,13 +134,11 @@ export class Model extends AjaxModel {
     toJSONApi(stripUndefined, onlyChanges) {
         let res = {};
         let data = this.toJSON(stripUndefined);
-        if (data.id) {
-            res.id = data.id;
-            delete data.id;
+        if (this.id) {
+            res.id = this.id;
         }
-        if (data.type) {
-            res.type = data.type;
-            delete data.type;
+        if (this.type) {
+            res.type = this.type;
         }
         if (onlyChanges) {
             let changed = this.changed();
