@@ -6,6 +6,14 @@ const SCHEMA = {
             $schema: 'http://json-schema.org/draft-06/schema#',
             type: 'object',
             properties: {
+                id: {
+                    type: 'string',
+                    readOnly: true,
+                },
+                type: {
+                    type: 'string',
+                    readOnly: true,
+                },
                 publish_end: {
                     oneOf: [{
                         type: 'null',
