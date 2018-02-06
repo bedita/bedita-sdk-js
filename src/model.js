@@ -33,6 +33,9 @@ export class Model extends AjaxModel {
 
     static create(type, schema) {
         const Ctr = this;
+        schema = {
+            allOf: [Ctr.schema, schema],
+        };
         return class extends Ctr {
             static get schema() { return schema; }
             get type() { return type; }
