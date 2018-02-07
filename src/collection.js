@@ -19,10 +19,14 @@ export class Collection extends AjaxCollection {
         return this.constructor.Model.prototype.type || this.constructor.Model.type;
     }
 
+    get defaultEndpoint() {
+        return null;
+    }
+
     model(data, EntityModel) {
         let resolveModel;
         if (!EntityModel && data && data.type) {
-            resolveModel = this.factory('registry').getModel(data.type, this.constructor.Model);
+            resolveModel = this.factory('model').getModel(data.type, this.constructor.Model);
         } else {
             resolveModel = Promise.resolve(EntityModel || this.constructor.Model);
         }
@@ -41,7 +45,7 @@ export class Collection extends AjaxCollection {
         let id = model.get('id');
         let Entity = options.Model || this.constructor.Model;
         if (!api && id) {
-            api = `${Entity.prototype.type || Entity.type}/${id}`;
+            api = `${this.defaultEndpoint || Entity.prototype.type || Entity.type}/${id}`;
         }
         if (!api) {
             return Promise.reject();
@@ -54,7 +58,7 @@ export class Collection extends AjaxCollection {
                         this.afterFetch(res)
                     )
                     .then((data) =>
-                        this.factory('registry').getModel(data.type, this.constructor.Model)
+                        this.factory('model').getModel(data.type, this.constructor.Model)
                             .catch(() => Promise.resolve(Entity))
                             .then((Model) => {
                                 if (Model && !(model instanceof Model)) {
@@ -129,7 +133,7 @@ export class Collection extends AjaxCollection {
         let api = options.endpoint;
         if (!api) {
             let id = model.get('id');
-            api = model.get('type');
+            api = this.defaultEndpoint || model.get('type');
             options.method = 'POST';
             if (id) {
                 options.method = 'PATCH';
@@ -159,7 +163,7 @@ export class Collection extends AjaxCollection {
     findAll(options = {}) {
         options = Collection.clone(options);
         let Entity = options.Model || this.constructor.Model;
-        let endpoint = options.endpoint || this.endpoint || Entity.prototype.type || Entity.type;
+        let endpoint = options.endpoint || this.endpoint || this.defaultEndpoint || Entity.prototype.type || Entity.type;
         if (!endpoint) {
             return Promise.reject();
         }
@@ -282,7 +286,7 @@ export class Collection extends AjaxCollection {
         if (!api) {
             let id = model.get('id');
             if (id) {
-                api = `${model.get('type')}/${id}`;
+                api = `${this.defaultEndpoint || model.get('type')}/${id}`;
             }
         }
         if (!api) {

@@ -15,6 +15,10 @@ export class ObjectTypesCollection extends Collection {
         return ObjectTypeModel;
     }
 
+    get defaultEndpoint() {
+        return '/model/object_types';
+    }
+
     /**
      * Return minimal properties set for index pages
      * 
@@ -25,12 +29,13 @@ export class ObjectTypesCollection extends Collection {
     }
 
     /**
-     * call Collection.findAll with custom endpoint for object_types
+     * call Collection.findAll with custom endpoint for available object_types for a collection
      * 
+     * @param {String} relName The relationship name.
      * @param {Object} options 
      */
-    findAll(options = {}) {
-        options.endpoint = '/model/object_types'; 
+    findAllByRelationship(relName, options = {}) {
+        options.endpoint = `${this.type}?filter[by_relation][name]=${relName}`;
         return super.findAll(options);
     }
 

@@ -1,5 +1,4 @@
 import { Collection } from '../collection.js';
-import { TypesCollection } from './types.js';
 
 export const RELATIONSHIP_MODES = {
     ONE_TO_MANY: 0,
@@ -69,7 +68,7 @@ export class RelationshipsCollection extends Collection {
 
     getMinimalPropertiesSet() {
         if (this.type && this.type.length === 1) {
-            return this.factory('registry').getCollection(this.type[0])
+            return this.factory('model').getCollection(this.type[0])
                 .then((Ctr) =>
                     Ctr.prototype.getMinimalPropertiesSet.call(this)
                 );
@@ -82,7 +81,7 @@ export class RelationshipsCollection extends Collection {
         if (types) {
             return Promise.resolve(types);
         }
-        return this.initClass(TypesCollection)
+        return this.factory('model').getObjectTypes()
             .then((collection) =>
                 collection.findAllByRelationship(this.name)
                     .then(() =>
@@ -99,7 +98,7 @@ export class RelationshipsCollection extends Collection {
                 let resolveCollection;
                 if (types.length === 1) {
                     types = types[0];
-                    resolveCollection = this.factory('registry').getCollection(types)
+                    resolveCollection = this.factory('model').getCollection(types)
                         .catch(() => Collection);
                 } else {
                     resolveCollection = Promise.resolve(Collection);
