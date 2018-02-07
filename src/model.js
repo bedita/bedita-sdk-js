@@ -1,4 +1,5 @@
 import { AjaxModel } from '@chialab/synapse/src/models/ajax.js';
+import { internal } from '@chialab/synapse/src/helpers/internal';
 import tv4 from 'tv4';
 
 tv4.addFormat('date-time', (data) => {
@@ -86,6 +87,10 @@ export class Model extends AjaxModel {
         return Promise.resolve(this);
     }
 
+    metadata() {
+        return internal(this).metadata || {};
+    }
+
     setFromResponse(res) {
         if (res) {
             if (res.id) {
@@ -114,10 +119,16 @@ export class Model extends AjaxModel {
                 delete res.attributes;
             }
             if (res.meta) {
-                this.set(res.meta, {
-                    validate: false,
-                    skipChanges: true,
-                });
+                internal(this).metadata = res.meta;
+                const schemaProperties = this.constructor.schemaProperties;
+                for (let metaName in res.meta) {
+                    if (schemaProperties.hasOwnProperty(metaName) && schemaProperties[metaName].readOnly) {
+                        this.set(metaName, res.meta[metaName], {
+                            validate: false,
+                            skipChanges: true,
+                        });
+                    }
+                }
                 this.tickModified(this.modified || 0);
                 delete res.meta;
             }
