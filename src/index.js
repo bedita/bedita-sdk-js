@@ -5,7 +5,6 @@ import { InjectableMixin } from '@chialab/synapse/src/mixins/injectable.js';
 
 // MODELS
 export * from './model.js';
-export * from './models/date_range.js';
 import { ObjectModel } from './models/object.js';
 import { RoleModel } from './models/role.js';
 import { UserModel } from './models/user.js';
@@ -91,10 +90,8 @@ export const CORE_COLLECTIONS = [
 export class Client extends mix(Factory).with(InjectableMixin) {
     static init(options) {
         let client = new this();
-        client.addReadyPromise(
-            client.initialize(options)
-        );
-        return client;
+        return client.initialize(options)
+            .then(() => client);
     }
 
     static get injectors() {
@@ -110,11 +107,16 @@ export class Client extends mix(Factory).with(InjectableMixin) {
         };
     }
 
-    initialize(options) {
+    initialize(options = {}) {
         internal(this).options = options;
         return super.initialize(options)
             .then(() => {
-                this.factory('api').config(options);
+                if (options.base) {
+                    this.config({
+                        base: options.base,
+                        apiKey: options.apiKey,
+                    });
+                }
                 if (Array.isArray(options.models)) {
                     options.models.forEach((Model) => {
                         this.registerModel(Model);
@@ -127,6 +129,13 @@ export class Client extends mix(Factory).with(InjectableMixin) {
                 }
                 return Promise.resolve();
             });
+    }
+
+    config(options) {
+        this.factory('api').config({
+            base: options.base,
+            apiKey: options.apiKey,
+        });
     }
 
     getModel(...args) {

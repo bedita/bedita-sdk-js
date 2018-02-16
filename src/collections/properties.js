@@ -10,6 +10,10 @@ export class PropertiesCollection extends Collection {
         return Promise.resolve(['name', 'description', 'property_type_name', 'object_type_name']);
     }
 
+    /**
+     * The endpoint for Properties.
+     * @type {String}
+     */
     get defaultEndpoint() {
         return '/model/properties';
     }

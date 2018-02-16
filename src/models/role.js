@@ -1,22 +1,62 @@
 import { BaseModel } from './base.js';
 
 const SCHEMA = {
-    definitions: BaseModel.schema.definitions,
     type: 'object',
+    $id: '{host}/model/schema/roles',
+    $schema: 'http://json-schema.org/draft-06/schema#',
     properties: {
-        id: { type: 'string', maximum: 255 },
-        name: { type: 'string', maximum: 255 },
-        type: { type: 'string', maximum: 255 },
-        description: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string', contentMediaType: 'text/html' },
-            ],
+        name: {
+            type: 'string',
+            $id: '/properties/name',
+            title: 'Name',
+            description: 'role unique name',
+            maxLength: 32,
         },
-        metadata: {
-            $ref: '#/definitions/metadata',
+        description: {
+            oneOf: [{
+                type: 'null',
+            }, {
+                type: 'string',
+                contentMediaType: 'text/html',
+            }],
+            $id: '/properties/description',
+            title: 'Description',
+            description: 'role description',
+        },
+        unchangeable: {
+            type: 'boolean',
+            $id: '/properties/unchangeable',
+            title: 'Unchangeable',
+            description: 'role data not modifiable (default:false)',
+            readOnly: true,
+            default: false,
+        },
+        created: {
+            oneOf: [{
+                type: 'null',
+            }, {
+                type: 'string',
+                format: 'date-time',
+            }],
+            $id: '/properties/created',
+            title: 'Created',
+            description: 'creation date',
+            readOnly: true,
+        },
+        modified: {
+            oneOf: [{
+                type: 'null',
+            }, {
+                type: 'string',
+                format: 'date-time',
+            }],
+            $id: '/properties/modified',
+            title: 'Modified',
+            description: 'last modification date',
+            readOnly: true,
         },
     },
+    required: ['name'],
 };
 
 export class RoleModel extends BaseModel {

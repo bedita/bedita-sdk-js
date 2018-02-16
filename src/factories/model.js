@@ -105,10 +105,10 @@ export class ModelFactory extends Factory {
         if (this.collectionQueue[type]) {
             return this.collectionQueue[type];
         }
-        this.collectionQueue[type] = this.getModel(type)
+        this.collectionQueue[type] = this.getModel(type, BaseCollection.Model)
             .then((Model) => {
                 let TypedCollection = BaseCollection.create(Model);
-                this.registerCollection(type, TypedCollection);
+                this.registerCollection(TypedCollection);
                 return Promise.resolve(TypedCollection);
             });
         return this.collectionQueue[type];
@@ -132,7 +132,7 @@ export class ModelFactory extends Factory {
      */
     initCollection(type, arr, BaseCollection) {
         let resolveCollectionCtr;
-        if (typeof data === 'function') {
+        if (typeof arr === 'function') {
             // initModel({type}, {BaseCollection})
             BaseCollection = arr;
             arr = undefined;

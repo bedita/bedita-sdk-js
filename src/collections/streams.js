@@ -60,6 +60,6 @@ export class StreamsCollection extends Collection {
     }
 
     getMinimalPropertiesSet() {
-        return Promise.resolve(['metadata.url', 'file_name', 'mime_type', 'metadata.version']);
+        return Promise.resolve(['url', 'file_name', 'mime_type', 'version']);
     }
 }
