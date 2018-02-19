@@ -159,6 +159,6 @@ export class Client extends mix(Factory).with(InjectableMixin) {
     }
 
     initModel(...args) {
-        return this.factory('model').initCollection(...args);
+        return this.factory('model').initModel(...args);
     }
 }
