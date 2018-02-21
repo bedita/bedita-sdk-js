@@ -95,7 +95,7 @@ export class Collection extends AjaxCollection {
                         let rels = model.getRelationships() || {};
                         for (let k in rels) {
                             let rel = rels[k];
-                            if (Array.isArray(rel)) {
+                            if (rel instanceof Collection) {
                                 rel.forEach((relModel) => {
                                     let objData = included.find((entry) =>
                                         entry.id === relModel.id && entry.type === relModel.type
