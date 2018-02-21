@@ -278,6 +278,7 @@ export class UserModel extends ObjectModel {
         return {
             roles: {
                 types: ['roles'],
+                include: true,
             },
         };
     }
