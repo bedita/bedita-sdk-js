@@ -18,6 +18,7 @@
   "author": "BEdita <info@bedita.com> (http://www.bedita.com)",
   "license": "LGPL-3.0",
   "dependencies": {
+    "@chialab/proteins": "^3.0.0-rc.9",
     "@chialab/synapse": "^2.0.0"
   },
   "devDependencies": {

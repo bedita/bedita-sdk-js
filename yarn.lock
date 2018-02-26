@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@chialab/proteins@^3.0.0-rc.9":
+  version "3.0.0-rc.9"
+  resolved "https://registry.npmjs.org/@chialab/proteins/-/proteins-3.0.0-rc.9.tgz#a7b31a13502f272cd7c8e8035753b629fd9967a6"
+
 "@chialab/router@^1.0.1":
   version "1.0.1"
   resolved "https://registry.npmjs.org/@chialab/router/-/router-1.0.1.tgz#1f05ceb7621a57a24dd3499341130c4c7789449a"

@@ -1,6 +1,6 @@
 import { Factory } from '@chialab/synapse/src/factory.js';
 import { UrlHelper } from '@chialab/synapse/src/helpers/url.js';
-import SchemaModel from '@chialab/schema-model';
+import { clone } from '@chialab/proteins/src/clone.js';
 
 const TOKEN_KEY = 'be.accessToken';
 const RENEW_TOKEN_KEY = 'be.renewToken';
@@ -102,21 +102,21 @@ export class Api extends Factory {
     }
 
     post(api, data, options) {
-        options = options ? SchemaModel.clone(options) : {};
+        options = options ? clone(options) : {};
         options.body = data;
         options.method = 'POST';
         return this.queue(() => this.request(api, options));
     }
 
     patch(api, data, options) {
-        options = options ? SchemaModel.clone(options) : {};
+        options = options ? clone(options) : {};
         options.body = data;
         options.method = 'PATCH';
         return this.queue(() => this.request(api, options));
     }
 
     delete(api, data, options) {
-        options = options ? SchemaModel.clone(options) : {};
+        options = options ? clone(options) : {};
         options.body = data;
         options.method = 'DELETE';
         options.headers = options.headers || {};

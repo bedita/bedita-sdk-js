@@ -181,7 +181,7 @@ export class BaseModel extends Model {
 
     addRelationship(name, model, params) {
         let collection = this.getRelationship(name);
-        if (collection.getIndexById(model.id) === -1) {
+        if (collection.getIndexByModel(model) === -1) {
             collection.add(model);
         }
         if (params) {

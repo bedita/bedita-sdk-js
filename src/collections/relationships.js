@@ -1,3 +1,4 @@
+import { clone } from '@chialab/proteins/src/clone.js';
 import { Collection } from '../collection.js';
 
 export const RELATIONSHIP_MODES = {
@@ -146,7 +147,7 @@ export class RelationshipsCollection extends Collection {
     }
 
     findAll(options = {}) {
-        options = Collection.clone(options);
+        options = clone(options);
         if (!options.endpoint) {
             options.endpoint = `${this.parent.type}/${this.parent.id}/${this.name}`;
         }

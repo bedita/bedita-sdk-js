@@ -1,4 +1,5 @@
 import { internal } from '@chialab/synapse/src/helpers/internal.js';
+import { clone } from '@chialab/proteins/src/clone.js';
 import { AjaxCollection } from '@chialab/synapse/src/collections/ajax.js';
 import { Model } from './model.js';
 
@@ -34,13 +35,13 @@ export class Collection extends AjaxCollection {
     }
 
     execFetch(options = {}) {
-        options = Collection.clone(options);
+        options = clone(options);
         options.method = options.method || 'get';
         return this.factory('api').request(options.endpoint, options);
     }
 
     fetch(model, options = {}) {
-        options = Collection.clone(options);
+        options = clone(options);
         let api = options.endpoint;
         let id = model.get('id');
         let Entity = options.Model || this.constructor.Model;
@@ -102,7 +103,7 @@ export class Collection extends AjaxCollection {
                                     );
                                     if (objData) {
                                         promises.push(
-                                            relModel.setFromResponse(Model.clone(objData))
+                                            relModel.setFromResponse(clone(objData))
                                         );
                                     }
                                 });
@@ -118,7 +119,7 @@ export class Collection extends AjaxCollection {
     }
 
     execPost(options = {}) {
-        options = Collection.clone(options);
+        options = clone(options);
         options.method = options.method || 'post';
         options.method = options.method.toLowerCase();
         return this.factory('api')[options.method](
@@ -129,7 +130,7 @@ export class Collection extends AjaxCollection {
     }
 
     post(model, options = {}) {
-        options = Collection.clone(options);
+        options = clone(options);
         let api = options.endpoint;
         if (!api) {
             let id = model.get('id');
@@ -161,7 +162,7 @@ export class Collection extends AjaxCollection {
     }
 
     findAll(options = {}) {
-        options = Collection.clone(options);
+        options = clone(options);
         let Entity = options.Model || this.constructor.Model;
         let endpoint = options.endpoint || this.endpoint || this.defaultEndpoint || Entity.prototype.type || Entity.type;
         if (!endpoint) {
@@ -279,7 +280,7 @@ export class Collection extends AjaxCollection {
     }
 
     delete(model, options = {}) {
-        options = Collection.clone(options);
+        options = clone(options);
         let api = options.endpoint;
         if (!api) {
             let id = model.get('id');
