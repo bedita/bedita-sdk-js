@@ -15,7 +15,7 @@ export class Url extends Factory {
         let keys = Object.keys(obj);
         if (keys.length) {
             for (let p in obj) {
-                if (obj.hasOwnProperty(p) && obj[p] !== undefined) {
+                if (obj.hasOwnProperty(p) && obj[p] !== undefined && obj[p] !== null) {
                     let k = prefix ? `${prefix}[${p}]` : p;
                     let v = obj[p];
                     if (v instanceof Date) {

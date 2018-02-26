@@ -182,7 +182,7 @@ export class Collection extends AjaxCollection {
         if (typeof options.search !== 'undefined') {
             queryParams.q = options.search;
         }
-        if (options.filter) {
+        if (typeof options.filter !== 'undefined') {
             queryParams.filter = options.filter;
         }
         let include = [];
