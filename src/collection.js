@@ -130,27 +130,28 @@ export class Collection extends AjaxCollection {
     }
 
     post(model, options = {}) {
-        options = clone(options);
-        let api = options.endpoint;
+        const modelOptions = clone(options);
+        const relationshipsOptions = clone(options);
+        let api = modelOptions.endpoint;
         if (!api) {
             let id = model.get('id');
             api = this.defaultEndpoint || model.get('type');
-            options.method = 'POST';
+            modelOptions.method = 'POST';
             if (id) {
-                options.method = 'PATCH';
+                modelOptions.method = 'PATCH';
                 api += `/${id}`;
             }
         }
         if (!api) {
             return Promise.reject();
         }
-        options.endpoint = api;
-        if (!options.body) {
-            options.body = { data: model.toJSONApi() };
+        modelOptions.endpoint = api;
+        if (!modelOptions.body) {
+            modelOptions.body = { data: model.toJSONApi() };
         }
-        return super.post(model, options)
+        return super.post(model, modelOptions)
             .then(() =>
-                model.postRelationships(options)
+                model.postRelationships(relationshipsOptions)
             ).then(() => {
                 model.resetChanges();
                 return Promise.resolve(model);
