@@ -64,12 +64,12 @@ export class Session extends Factory {
         return Promise.reject();
     }
 
-    logout() {
+    logout(...args) {
         this.user = null;
         localStorage.removeItem('user.id');
         const apiFactory = this.factory('api');
         apiFactory.logout();
-        this.trigger('logout');
+        this.trigger('logout', ...args);
     }
 
     renew() {
