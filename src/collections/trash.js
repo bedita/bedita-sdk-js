@@ -1,4 +1,4 @@
-import { clone } from '@chialab/proteins/src/clone.js';
+import clone from '@chialab/proteins/src/clone.js';
 import { ObjectsCollection } from './objects.js';
 
 export class TrashCollection extends ObjectsCollection {

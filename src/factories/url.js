@@ -1,5 +1,5 @@
 import { Factory } from '@chialab/synapse/src/factory.js';
-import objectPath from 'object-path';
+import * as keypath from '@chialab/proteins/src/keypath.js';
 
 export class Url extends Factory {
     chunk(key, val) {
@@ -44,7 +44,7 @@ export class Url extends Factory {
             if (chunk[0] && chunk[1]) {
                 let key = chunk[0].replace(/\[(.*?)\]/g, '.$1');
                 let val = decodeURIComponent(chunk[1]);
-                objectPath.set(res, key, val);
+                keypath.set(res, key, val);
             }
         }
 

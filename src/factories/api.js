@@ -1,6 +1,6 @@
 import { Factory } from '@chialab/synapse/src/factory.js';
 import { UrlHelper } from '@chialab/synapse/src/helpers/url.js';
-import { clone } from '@chialab/proteins/src/clone.js';
+import clone from '@chialab/proteins/src/clone.js';
 
 const TOKEN_KEY = 'be.accessToken';
 const RENEW_TOKEN_KEY = 'be.renewToken';
