@@ -25,10 +25,8 @@ const SCHEMA = {
             description: 'Original file name',
         },
         url: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string' },
-            ],
+            type: 'string',
+            readOnly: true,
         },
         mime_type: {
             type: 'string',
