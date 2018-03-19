@@ -181,11 +181,11 @@ export class Collection extends AjaxCollection {
         if (typeof options.pageSize !== 'undefined') {
             queryParams.page_size = options.pageSize;
         }
-        if (typeof options.search !== 'undefined') {
-            queryParams.q = options.search;
-        }
         if (typeof options.filter !== 'undefined') {
             queryParams.filter = options.filter;
+        }
+        if (options.search) {
+            queryParams.q = options.search;
         }
         let include = [];
         if (Entity.relationships) {
