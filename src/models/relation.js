@@ -64,6 +64,6 @@ export class RelationModel extends BaseModel {
      * @return {String} relation model type
      */
     get type() {
-        return 'relation';
+        return 'relations';
     }
 }
