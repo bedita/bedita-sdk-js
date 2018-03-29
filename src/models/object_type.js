@@ -130,4 +130,20 @@ export class ObjectTypeModel extends BaseModel {
                 return Promise.resolve(model);
             });
     }
+
+    /**
+     * Get all left relations.
+     * @return {Promise<RelationsCollection>}
+     */
+    getLeftRelationships() {
+        return this.factory('model').getLeftRelationsForType();
+    }
+
+    /**
+     * Get all right relations.
+     * @return {Promise<RelationsCollection>}
+     */
+    getRightRelationships() {
+        return this.factory('model').getLeftRelationsForType();
+    }
 }

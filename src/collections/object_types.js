@@ -9,7 +9,7 @@ export class ObjectTypesCollection extends Collection {
     /**
      * Return object type model
      * 
-     * @return {ObjectTypeModel} object type model
+     * @return {Function<ObjectTypeModel>} object type model
      */
     static get Model() {
         return ObjectTypeModel;
@@ -33,7 +33,7 @@ export class ObjectTypesCollection extends Collection {
     }
 
     /**
-     * call Collection.findAll with custom endpoint for available object_types for a collection
+     * call Collection.findAll with custom endpoint for available object_types for a relation
      * 
      * @param {String} relName The relationship name.
      * @param {Object} options 

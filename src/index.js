@@ -14,6 +14,7 @@ import { ApplicationModel } from './models/application.js';
 import { ObjectTypeModel } from './models/object_type.js';
 import { PropertyTypeModel } from './models/property_type.js';
 import { PropertyModel } from './models/property.js';
+import { RelationModel } from './models/relation.js';
 
 export { ObjectModel };
 export { RoleModel };
@@ -23,7 +24,8 @@ export { MediaModel };
 export { ApplicationModel };
 export { ObjectTypeModel };
 export { PropertyTypeModel };
-export { PropertyModel };   
+export { PropertyModel };
+export { RelationModel };
 
 // COLLECTIONS
 export * from './collection.js';
@@ -38,6 +40,7 @@ import { ApplicationsCollection } from './collections/applications.js';
 import { ObjectTypesCollection } from './collections/object_types.js';
 import { PropertyTypesCollection } from './collections/property_types.js';
 import { PropertiesCollection } from './collections/properties.js';
+import { RelationsCollection } from './collections/relations.js';
 
 export { ObjectsCollection };
 export { RolesCollection };
@@ -49,6 +52,7 @@ export { ApplicationsCollection };
 export { ObjectTypesCollection };
 export { PropertyTypesCollection };
 export { PropertiesCollection };
+export { RelationsCollection };
 
 import { Api } from './factories/api.js';
 import { Url } from './factories/url.js';
@@ -72,6 +76,7 @@ export const CORE_MODELS = [
     ObjectTypeModel,
     PropertyTypeModel,
     PropertyModel,
+    RelationModel,
 ];
 
 export const CORE_COLLECTIONS = [
@@ -85,6 +90,7 @@ export const CORE_COLLECTIONS = [
     ObjectTypesCollection,
     PropertyTypesCollection,
     PropertiesCollection,
+    RelationsCollection,
 ];
 
 export class Client extends mix(Factory).with(InjectableMixin) {

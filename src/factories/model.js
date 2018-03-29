@@ -4,6 +4,7 @@ import { Collection } from '../collection.js';
 import { ObjectTypesCollection } from '../collections/object_types.js';
 import { PropertyTypesCollection } from '../collections/property_types.js';
 import { PropertiesCollection } from '../collections/properties.js';
+import { RelationsCollection } from '../collections/relations.js';
 
 /**
  * Handle models via API.
@@ -263,5 +264,56 @@ export class ModelFactory extends Factory {
                 }
                 return collection;
             });
+    }
+
+    /**
+     * Fetch all object types for a relations.
+     * @param {string} relName the relation name
+     * @return {Promise<ObjectTypesCollection>}
+     */
+    getObjectTypesForRelation(relName) {
+        return this.initCollection(ObjectTypesCollection)
+            .then((collection) =>
+                collection.findAllByRelationship(relName)
+                    .then(() => collection)
+            );
+    }
+
+    /**
+     * Fetch all available relations.
+     * @return {Promise<RelationsCollection>}
+     */
+    getRelations() {
+        return this.initClass(RelationsCollection)
+            .then((collection) =>
+                collection.findAll()
+                    .then(() => collection)
+            );
+    }
+
+    /**
+     * Fetch all available left relations for a object type.
+     * @param {String} type The object type name.
+     * @return {Promise<RelationsCollection>}
+     */
+    getLeftRelationsForType(type) {
+        return this.initClass(RelationsCollection)
+            .then((collection) =>
+                collection.findAllLeftByObjectType(type)
+                    .then(() => collection)
+            );
+    }
+
+    /**
+     * Fetch all available right relations for a object type.
+     * @param {String} type The object type name.
+     * @return {Promise<RelationsCollection>}
+     */
+    getRightRelationsForType(type) {
+        return this.initClass(RelationsCollection)
+            .then((collection) =>
+                collection.findAllRightByObjectType(type)
+                    .then(() => collection)
+            );
     }
 }
