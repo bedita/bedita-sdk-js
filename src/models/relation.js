@@ -1,5 +1,5 @@
 import { BaseModel } from './base.js';
-import { RELATIONSHIP_MODES } from '../collection/relationships.js';
+import { RELATIONSHIP_MODES } from '../collections/relationships.js';
 
 /**
  * @constant model schema
