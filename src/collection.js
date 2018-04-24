@@ -2,7 +2,6 @@ import clone from '@chialab/proteins/src/clone.js';
 import { internal } from '@chialab/synapse/src/helpers/internal.js';
 import { AjaxCollection } from '@chialab/synapse/src/collections/ajax.js';
 import { Model } from './model.js';
-import { merge } from '@chialab/proteins';
 
 export class Collection extends AjaxCollection {
     static create(Model) {
@@ -163,12 +162,6 @@ export class Collection extends AjaxCollection {
         return Promise.resolve(res.data);
     }
 
-    /**
-     * Fetch all objects in the collection.
-     * 
-     * @param {Object} options Additional options.
-     * @return {Promise}
-     */
     findAll(options = {}) {
         options = clone(options);
         let Entity = options.Model || this.constructor.Model;
@@ -235,28 +228,19 @@ export class Collection extends AjaxCollection {
 
         let promise = super.findAll(options);
         if (options.full) {
-            // Load all results by fetching all pages in parallel.
-            const currentPage = options.page || 1;
-            promise = promise.then(() => {
+            // Load all results by fetching all pages one after the other.
+            let currentPage = options.page || 1;
+            promise = promise.then((res) => {
                 if (!this.pagination || this.pagination.page_count <= currentPage) {
-                    return Promise.resolve();
+                    return Promise.resolve(res);
                 }
 
-                const allPromises = [];
-                for (let page = currentPage + 1; page <= this.pagination.page_count; page++) {
-                    allPromises.push(
-                        this.getCleanCopy()
-                            .then(collection =>
-                                collection.findAll(merge(options, { page, full: false }))
-                                    .then(() => Promise.resolve(collection))
-                            )
+                return this.getCleanCopy().then((collection) => {
+                    options.page = currentPage + 1;
+                    return collection.findAll(options).then(() =>
+                        this.joinCollection(collection)
                     );
-                }
-
-                return Promise.all(allPromises)
-                    .then(pages => {
-                        pages.forEach(page => this.joinCollection(page));
-                    });
+                });
             });
         }
 
@@ -332,9 +316,7 @@ export class Collection extends AjaxCollection {
      * @return {Promise}
      */
     joinCollection(collection) {
-        this.add(...collection.array);
-
-        return Promise.resolve();
+        return Promise.all(collection.map((model) => this.add(model)));
     }
 
     /**
