@@ -321,7 +321,12 @@ export class RelationshipsCollection extends Collection {
 
     /** @inheritdoc */
     joinCollection(collection) {
-        return super.joinCollection(collection)
+        let joinPromise = Promise.resolve();
+        if (this.parent !== collection.parent) {
+            joinPromise = super.joinCollection(collection);
+        }
+
+        return joinPromise
             .then(() => {
                 this.paramsList = this.paramsList || [];
                 this.paramsList.push(...(collection.paramsList || []));
