@@ -1,5 +1,4 @@
 import { Factory } from '@chialab/synapse/src/factory.js';
-import { Model } from '../model.js';
 import { Collection } from '../collection.js';
 import { ObjectTypesCollection } from '../collections/object_types.js';
 import { PropertyTypesCollection } from '../collections/property_types.js';
@@ -56,21 +55,27 @@ export class ModelFactory extends Factory {
     /**
      * Get a Model constructor by type.
      * @param {String} type The type of the Model to retrieve.
-     * @param {Class<Model>} BaseModel The base Model to extends in case of runtime creation.
      * @return {Promise<Class<Model>>} The Model constructor.
      */
-    getModel(type, BaseModel = Model) {
+    getModel(type) {
         if (this.hasModel(type)) {
             return Promise.resolve(this.models[type]);
         }
         if (this.modelQueue[type]) {
             return this.modelQueue[type];
         }
-        this.modelQueue[type] = this.getSchema(type)
-            .then((data) => {
-                let TypedModel = BaseModel.create(type, data);
-                this.registerModel(TypedModel);
-                return Promise.resolve(TypedModel);
+        this.modelQueue[type] = this.getObjectType(type)
+            .then((objectType) => {
+                let parentId = objectType.parent_name || 'objects';
+                return this.getModel(parentId)
+                    .then((ParentModel) =>
+                        this.getSchema(type)
+                            .then((data) => {
+                                let TypedModel = ParentModel.create(type, data);
+                                this.registerModel(TypedModel);
+                                return TypedModel;
+                            })
+                    );
             });
         return this.modelQueue[type];
     }
@@ -95,19 +100,18 @@ export class ModelFactory extends Factory {
     /**
      * Get a Collection constructor by type.
      * @param {String} type The type of the Collection to retrieve.
-     * @param {Class<Collection>} BaseCollection The base Collection to extends in case of runtime creation.
      * @return {Promise<Class<Collection>>} The Collection constructor.
      */
-    getCollection(type, BaseCollection = Collection) {
+    getCollection(type) {
         if (this.hasCollection(type)) {
             return Promise.resolve(this.collections[type]);
         }
         if (this.collectionQueue[type]) {
             return this.collectionQueue[type];
         }
-        this.collectionQueue[type] = this.getModel(type, BaseCollection.Model)
+        this.collectionQueue[type] = this.getModel(type)
             .then((Model) => {
-                let TypedCollection = BaseCollection.create(Model);
+                let TypedCollection = Collection.create(Model);
                 this.registerCollection(TypedCollection);
                 return Promise.resolve(TypedCollection);
             });
@@ -127,19 +131,13 @@ export class ModelFactory extends Factory {
      * Instantiate a new Collection by type.
      * @param {String} type The collection type.
      * @param {Object} arr The initial array of models.
-     * @param {Function} BaseCollection The base collection constructor.
      * @return {Promise<Collection>}
      */
-    initCollection(type, arr, BaseCollection) {
+    initCollection(type, arr) {
         let resolveCollectionCtr;
-        if (typeof arr === 'function') {
-            // initModel({type}, {BaseCollection})
-            BaseCollection = arr;
-            arr = undefined;
-        }
         if (typeof type === 'string') {
             // get or generate the collection
-            resolveCollectionCtr = this.getCollection(type, BaseCollection);
+            resolveCollectionCtr = this.getCollection(type);
         } else if (typeof type === 'function') {
             // already a Class contrusctor
             resolveCollectionCtr = Promise.resolve(type);
@@ -151,19 +149,13 @@ export class ModelFactory extends Factory {
      * Instantiate a new Model by type.
      * @param {String} type The model type.
      * @param {Object} data A set of initial data.
-     * @param {Function} BaseModel The base model constructor.
      * @return {Promise<Model>}
      */
-    initModel(type, data, BaseModel) {
+    initModel(type, data) {
         let resolveModelCtr;
-        if (typeof data === 'function') {
-            // initModel({type}, {BaseModel})
-            BaseModel = data;
-            data = undefined;
-        }
         if (typeof type === 'string') {
             // get or generate the model
-            resolveModelCtr = this.getModel(type, BaseModel);
+            resolveModelCtr = this.getModel(type);
         } else if (typeof type === 'function') {
             // already a Class contrusctor
             resolveModelCtr = Promise.resolve(type);
