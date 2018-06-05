@@ -2,38 +2,34 @@ import { Collection } from '../collection.js';
 import { ObjectTypeModel } from '../models/object_type.js';
 
 /**
- * Object Types Collection
+ * @class bedita.ObjectTypesCollection
+ * @extends bedita.Collection
+ * A collection for ObjectTypeModels.
  */
 export class ObjectTypesCollection extends Collection {
-
     /**
-     * Return object type model
-     * 
-     * @return {ObjectTypeModel} object type model
+     * @inheritdoc
      */
     static get Model() {
         return ObjectTypeModel;
     }
 
     /**
-     * The endpoint for ObjectTypes.
-     * @type {String}
+     * @inheritdoc
      */
     get defaultEndpoint() {
         return '/model/object_types';
     }
 
     /**
-     * Return minimal properties set for index pages
-     * 
-     * @return {Promise<Array>} properties set
+     * @inheritdoc
      */
     getMinimalPropertiesSet() {
         return Promise.resolve(['id', 'name', 'is_abstract', 'description']);
     }
 
     /**
-     * call Collection.findAll with custom endpoint for available object_types for a collection
+     * call Collection.findAll with custom endpoint for available object_types for a relation.
      * 
      * @param {String} relName The relationship name.
      * @param {Object} options 

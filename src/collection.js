@@ -3,8 +3,20 @@ import { internal } from '@chialab/synapse/src/helpers/internal.js';
 import { AjaxCollection } from '@chialab/synapse/src/collections/ajax.js';
 import { Model } from './model.js';
 
+/**
+ * @class bedita.Collection
+ * @extends AjaxCollection
+ * A generic Collection class for BEdita models.
+ */
 export class Collection extends AjaxCollection {
+    /**
+     * Create a new Collection constructor which handle the given Model instances.
+     * @static
+     * @param {Function} Model The constructor of the Collection's instances.
+     * @return {Function} The extended Collection
+     */
     static create(Model) {
+        // dynamically create a class which uses the given Model.
         return class extends Collection {
             static get Model() {
                 return Model;
@@ -12,14 +24,31 @@ export class Collection extends AjaxCollection {
         };
     }
 
+    /**
+     * The Model constructor of the Collection's instances.
+     * @type {Function}
+     * @static
+     */
     static get Model() {
         return Model;
     }
 
+    /**
+     * The type of the instances.
+     * Aliases to `type` property of the Model.
+     * @type {String}
+     */
     get type() {
-        return this.constructor.Model.prototype.type || this.constructor.Model.type;
+        // get the Model constructor for the Collection
+        const Model = this.constructor.Model;
+        // return Model type
+        return Model.prototype.type || Model.type;
     }
 
+    /**
+     * The default endpoint to use for fetching models data.
+     * @type {String}
+     */
     get defaultEndpoint() {
         return null;
     }
@@ -274,37 +303,67 @@ export class Collection extends AjaxCollection {
         return false;
     }
 
+    /**
+     * When the Collection is paginated, update the the models for the requested page.
+     * @param {Number} pageNum The requested page number.
+     * @return {Promise}
+     */
     page(pageNum) {
+        // get the options for the last fetch
         let options = internal(this).lastOptions || {};
+        // update the page number
         options.page = pageNum;
+        // exec a `findAll`
         return this.findAll(options);
     }
 
+    /**
+     * Remote model deletion.
+     *
+     * @param {Model} model The model to delete.
+     * @param {Object} options Options for the api call.
+     * @return {Promise}
+     */
     delete(model, options = {}) {
         options = clone(options);
-        let api = options.endpoint;
-        if (!api) {
+        let api;
+        if (options.endpoint) {
+            // the endpoint for model deletion has been provided in the options
+            api = options.endpoint;
+        } else {
+            // check if the model exists in the database in order to generare the endpoint
             let id = model.get('id');
             if (id) {
+                // generate the api endpoint
                 api = `${this.defaultEndpoint || model.get('type')}/${id}`;
             }
         }
         if (!api) {
+            // missing endpoint, cannot delete the model
             return Promise.reject();
         }
+        // trigger the `beforeFetch` hook
         return this.beforeFetch(options)
             .then((options) =>
+                // exec a DELETE ajax call
                 this.factory('api').delete(api, undefined, options)
                     .then((res) =>
+                        // trigger the `afterFetch` hook
                         this.afterFetch(res)
                     )
                     .then(() => {
+                        // empty delete the model
                         model.delete();
+                        // destory model listeners and interactions
                         return model.destroy();
                     })
             );
     }
 
+    /**
+     * Get a set of important properties to show in index.
+     * @return {Promise<Array<String>>}
+     */
     getMinimalPropertiesSet() {
         return Promise.resolve(['id', 'type', 'uname', 'title', 'created', 'modified']);
     }
@@ -328,6 +387,10 @@ export class Collection extends AjaxCollection {
         return this.initClass(this.constructor);
     }
 
+    /**
+     * Async method for Collection update.
+     * @return {Promise}
+     */
     update() {
         return Promise.resolve();
     }
