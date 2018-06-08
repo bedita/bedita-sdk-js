@@ -71,7 +71,13 @@ export class ModelFactory extends Factory {
                     .then((ParentModel) =>
                         this.getSchema(type)
                             .then((data) => {
-                                let TypedModel = ParentModel.create(type, data);
+                                let relations = {};
+                                if (objectType.metadata().relations) {
+                                    objectType.metadata().relations.forEach((rel) => {
+                                        relations[rel] = {};
+                                    });
+                                }
+                                let TypedModel = ParentModel.create(type, data, relations);
                                 this.registerModel(TypedModel);
                                 return TypedModel;
                             })
