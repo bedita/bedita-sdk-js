@@ -165,7 +165,7 @@ export class BaseModel extends Model {
                         collection.fetched = true;
                         return Promise.all(
                             rel.data.map((modelData) =>
-                                collection.model(modelData, Model)
+                                collection.model(modelData)
                                     .then((model) =>
                                         this.addRelationship(name, model)
                                     )

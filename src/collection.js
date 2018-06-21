@@ -56,7 +56,9 @@ export class Collection extends AjaxCollection {
     model(data, EntityModel) {
         let resolveModel;
         if (!EntityModel && data && data.type) {
-            resolveModel = this.factory('model').getModel(data.type, this.constructor.Model);
+            resolveModel = this.factory('model')
+                .getModel(data.type, this.constructor.Model)
+                .catch(() => this.constructor.Model);
         } else {
             resolveModel = Promise.resolve(EntityModel || this.constructor.Model);
         }
