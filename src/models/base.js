@@ -106,7 +106,6 @@ export class BaseModel extends Model {
                     let objData = included.find((entry) =>
                         entry.id === relModel.id && entry.type === relModel.type
                     );
-                    console.log(relationName, objData);
                     if (objData) {
                         promises.push(
                             relModel.setFromResponse(clone(objData))
