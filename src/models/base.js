@@ -1,3 +1,4 @@
+import clone from '@chialab/proteins/src/clone.js';
 import { Model } from '../model.js';
 import { RelationshipsCollection } from '../collections/relationships.js';
 
@@ -70,7 +71,7 @@ export class BaseModel extends Model {
         return super.reset(skipChanges);
     }
 
-    setFromResponse(res) {
+    setFromResponse(res, included = []) {
         if (res) {
             let relPromise = Promise.resolve();
             if (res.relationships) {
@@ -79,15 +80,42 @@ export class BaseModel extends Model {
             }
             return relPromise.then(() =>
                 super.setFromResponse(res)
+                    .then((lastRes) => {
+                        if (included && included.length) {
+                            return this.setIncludedFromResponse(included)
+                                .then(() => lastRes);
+                        }
+                        return lastRes;
+                    })
                     .then((lastRes) =>
                         this.trigger('synced')
-                            .then(() =>
-                                Promise.resolve(lastRes)
-                            )
+                            .then(() => lastRes)
                     )
             );
         }
         return super.setFromResponse(res);
+    }
+
+    setIncludedFromResponse(included = []) {
+        let promises = [];
+        let relationships = this.getRelationships() || {};
+        for (let relationName in relationships) {
+            let relationship = relationships[relationName];
+            if (relationship instanceof RelationshipsCollection) {
+                relationship.forEach((relModel) => {
+                    let objData = included.find((entry) =>
+                        entry.id === relModel.id && entry.type === relModel.type
+                    );
+                    console.log(relationName, objData);
+                    if (objData) {
+                        promises.push(
+                            relModel.setFromResponse(clone(objData))
+                        );
+                    }
+                });
+            }
+        }
+        return Promise.all(promises);
     }
 
     getRelationships() {

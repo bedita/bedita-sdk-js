@@ -123,24 +123,7 @@ export class Collection extends AjaxCollection {
                 let included = this.included;
                 let promises = [];
                 if (included.length) {
-                    models.forEach((model) => {
-                        let rels = model.getRelationships() || {};
-                        for (let k in rels) {
-                            let rel = rels[k];
-                            if (rel instanceof Collection) {
-                                rel.forEach((relModel) => {
-                                    let objData = included.find((entry) =>
-                                        entry.id === relModel.id && entry.type === relModel.type
-                                    );
-                                    if (objData) {
-                                        promises.push(
-                                            relModel.setFromResponse(clone(objData))
-                                        );
-                                    }
-                                });
-                            }
-                        }
-                    });
+                    promises = models.map((model) => model.setIncludedFromResponse(included));
                 }
                 return Promise.all(promises)
                     .then(() =>
@@ -238,7 +221,7 @@ export class Collection extends AjaxCollection {
             queryParams.include = include.join(',');
         }
 
-        // check if field filter is set, search if fields are valid 
+        // check if field filter is set, search if fields are valid
         // for model schema and add them to queryParams
         let fields = [];
         if (Entity.schema && Entity.schema.properties && options.fields) {

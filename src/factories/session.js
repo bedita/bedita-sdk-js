@@ -17,7 +17,7 @@ export class Session extends Factory {
                         .then((res) =>
                             collection.model()
                                 .then((model) =>
-                                    model.setFromResponse(res.data)
+                                    model.setFromResponse(res.data, res.included)
                                         .then(() => {
                                             this.user = model;
                                             internal(this).userPromise = null;
@@ -52,7 +52,7 @@ export class Session extends Factory {
                 .then((collection) =>
                     collection.model()
                         .then((model) =>
-                            model.setFromResponse(res.data)
+                            model.setFromResponse(res.data, res.included)
                                 .then(() => {
                                     this.user = model;
                                     this.trigger('login', this.user);
