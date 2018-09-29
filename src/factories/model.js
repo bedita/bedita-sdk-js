@@ -72,8 +72,8 @@ export class ModelFactory extends Factory {
                         this.getSchema(type)
                             .then((data) => {
                                 let relations = {};
-                                if (objectType.metadata().relations) {
-                                    objectType.metadata().relations.forEach((rel) => {
+                                if (objectType.metadata.relations) {
+                                    objectType.metadata.relations.forEach((rel) => {
                                         relations[rel] = {};
                                     });
                                 }

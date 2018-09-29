@@ -87,7 +87,7 @@ export class Model extends AjaxModel {
         return Promise.resolve(this);
     }
 
-    metadata() {
+    get metadata() {
         return internal(this).metadata || {};
     }
 
