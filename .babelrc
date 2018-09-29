@@ -1,14 +1,10 @@
 {
     "presets": [
-        ["es2015", {
-            "modules": false
-        }]
-    ],
-    "plugins": [
-        "external-helpers",
         [
-            "transform-es2015-classes",
-            { "loose": true }
+            "@babel/env",
+            {
+                "modules": false
+            }
         ]
     ]
 }
