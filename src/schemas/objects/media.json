@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "width": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "height": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "duration": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "singular": {
+      "type": "string"
+    },
+    "is_abstract": {
+      "type": "boolean"
+    },
+    "description": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "hidden": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "parent_name": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
+  }
+}

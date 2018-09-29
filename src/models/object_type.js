@@ -1,38 +1,5 @@
 import { BaseModel } from './base.js';
-
-/**
- * @constant model schema
- * @type {Object}
- */
-const SCHEMA = {
-    definitions: BaseModel.schema.definitions,
-    type: 'object',
-    properties: {
-        id: { type: 'string', maximum: 255 },
-        type: { type: 'string', maximum: 255 },
-        name: { type: 'string', maximum: 50 },
-        singular: { type: 'string', maximum: 50 },
-        is_abstract: { type: 'boolean' },
-        description: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string' },
-            ],
-        },
-        hidden: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string' },
-            ],
-        },
-        parent_name: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string', maximum: 50 },
-            ],
-        },
-    },
-};
+import SCHEMA from '../schemas/model/object_type.json';
 
 /**
  * Object type model

@@ -1,0 +1,58 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "api_key": {
+      "type": "string",
+      "readOnly": true
+    },
+    "description": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "contentMediaType": "text/html"
+        }
+      ]
+    },
+    "created": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "object",
+          "format": "date-time"
+        }
+      ],
+      "readOnly": true
+    },
+    "modified": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "object",
+          "format": "date-time"
+        }
+      ],
+      "readOnly": true
+    },
+    "enabled": {
+      "type": "boolean"
+    }
+  }
+}

@@ -22,11 +22,10 @@ export class BaseModel extends Model {
      * @inheritdoc
      */
     initialize(...args) {
-        let ctrRelationships = this.constructor.relationships || {};
         return super.initialize(...args)
             .then(() =>
                 // setup object relationships collections.
-                this.setupRelationships(ctrRelationships)
+                this.setupRelationships()
             );
     }
 
@@ -36,24 +35,21 @@ export class BaseModel extends Model {
     merge(model) {
         return super.merge(model)
             .then(() => {
-                let rels = model.getRelationships() || {};
-                return this.setupRelationships(rels)
-                    .then(() => {
-                        Object.keys(rels).forEach((name) => {
-                            let collection = this.getRelationship(name);
-                            collection.reset();
-                            let parentCollection = model.getRelationship(name);
-                            parentCollection.forEach((relModel) => {
-                                this.addRelationship(
-                                    name,
-                                    relModel,
-                                    model.getRelationshipMeta(name, relModel)
-                                );
-                            });
-                            collection.resetChanges();
-                        });
-                        return Promise.resolve(this);
+                let relationships = model.getRelationships() || {};
+                Object.keys(relationships).forEach((relationName) => {
+                    let collection = this.getRelationship(relationName);
+                    let parentCollection = model.getRelationship(relationName);
+                    collection.reset();
+                    parentCollection.forEach((relatedModel) => {
+                        this.addRelationship(
+                            relationName,
+                            relatedModel,
+                            model.getRelationshipMeta(relationName, relatedModel)
+                        );
                     });
+                    collection.resetChanges();
+                });
+                return Promise.resolve(this);
             });
     }
 
@@ -73,25 +69,18 @@ export class BaseModel extends Model {
 
     setFromResponse(res, included = []) {
         if (res) {
-            let relPromise = Promise.resolve();
-            if (res.relationships) {
-                relPromise = this.setupRelationships(res.relationships);
-                delete res.relationships;
-            }
-            return relPromise.then(() =>
-                super.setFromResponse(res)
-                    .then((lastRes) => {
-                        if (included && included.length) {
-                            return this.setIncludedFromResponse(included)
-                                .then(() => lastRes);
-                        }
-                        return lastRes;
-                    })
-                    .then((lastRes) =>
-                        this.trigger('synced')
-                            .then(() => lastRes)
-                    )
-            );
+            super.setFromResponse(res)
+                .then((lastRes) => {
+                    if (included && included.length) {
+                        return this.setIncludedFromResponse(included)
+                            .then(() => lastRes);
+                    }
+                    return lastRes;
+                })
+                .then((lastRes) =>
+                    this.trigger('synced')
+                        .then(() => lastRes)
+                );
         }
         return super.setFromResponse(res);
     }
@@ -174,11 +163,12 @@ export class BaseModel extends Model {
         });
     }
 
-    setupRelationships(rels = {}) {
+    setupRelationships() {
+        let relationships = this.constructor.relationships || {};
         let collections = this.getRelationships() || {};
         return Promise.all(
-            Object.keys(rels).map((name) => {
-                let rel = rels[name];
+            Object.keys(relationships).map((name) => {
+                let rel = relationships[name];
                 let relPromise = Promise.resolve(collections[name]);
                 if (!collections.hasOwnProperty(name)) {
                     relPromise = this.initClass(RelationshipsCollection, name, this)

@@ -1,41 +1,10 @@
 import { ObjectModel } from './object.js';
 import { RELATIONSHIP_MODES } from '../collections/relationships.js';
-
-const SCHEMA = {
-    type: 'object',
-    properties: {
-        name: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'string', maximum: 255 },
-            ],
-        },
-        width: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'number' },
-            ],
-        },
-        height: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'number' },
-            ],
-        },
-        duration: {
-            oneOf: [
-                { type: 'null' },
-                { type: 'number' },
-            ],
-        },
-    },
-};
+import SCHEMA from '../schemas/objects/media.json';
 
 export class MediaModel extends ObjectModel {
     static get schema() {
-        return {
-            allOf: [ObjectModel.schema, SCHEMA],
-        };
+        return SCHEMA;
     }
 
     static get relationships() {

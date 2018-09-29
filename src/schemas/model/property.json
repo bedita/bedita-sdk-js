@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "property_type_name": {
+      "type": "string"
+    },
+    "object_type_name": {
+      "type": "string"
+    },
+    "description": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "required": ["name", "property_type_name", "object_type_name"]
+}

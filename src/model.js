@@ -12,24 +12,9 @@ tv4.addFormat('date-time', (data) => {
     return 'Invalid date';
 });
 
-const SCHEMA = {
-    type: 'object',
-    additionalProperties: true,
-    properties: {
-        created: {
-            type: 'string',
-            format: 'date-time',
-        },
-        modified: {
-            type: 'string',
-            format: 'date-time',
-        },
-    },
-};
-
 export class Model extends AjaxModel {
     static get schema() {
-        return SCHEMA;
+        return {};
     }
 
     static create(type, schema) {
