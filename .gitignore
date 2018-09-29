@@ -17,6 +17,8 @@ ehthumbs.db
 Thumbs.db
 
 # App
+.eslintcache
+yarn-error.log
 npm-debug.log
 /node_modules
 /dist

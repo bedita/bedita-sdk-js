@@ -4,7 +4,9 @@
   "description": "BEdita SDK for JavaScript.",
   "main": "src/index.js",
   "scripts": {
-    "build": "rollup --config"
+    "lint": "eslint src/",
+    "build": "eslint src/ && rollup -c",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -24,7 +26,10 @@
   "devDependencies": {
     "@babel/core": "^7.1.2",
     "@babel/preset-env": "^7.1.0",
-    "eslint": "4.2.0",
+    "babel-eslint": "8",
+    "eslint": "^5.6.1",
+    "eslint-plugin-babel": "^5.2.1",
+    "eslint-plugin-mocha": "^5.2.0",
     "rollup": "^0.66.2",
     "rollup-plugin-babel": "^4.0.3",
     "rollup-plugin-commonjs": "^9.1.8",
