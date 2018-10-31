@@ -118,18 +118,13 @@ export class Collection extends AjaxCollection {
     }
 
     setFromResponse(data) {
-        return super.setFromResponse(data)
-            .then((models) => {
-                let included = this.included;
-                let promises = [];
-                if (included.length) {
-                    promises = models.map((model) => model.setIncludedFromResponse(included));
-                }
-                return Promise.all(promises)
-                    .then(() =>
-                        Promise.resolve(models)
-                    );
-            });
+        const modelFactory = this.factory('model');
+        return Promise.all(
+            data.map((entryData) =>
+                modelFactory.initModel(entryData.type)
+                    .then((model) => model.setFromResponse(entryData, this.included))
+            )
+        );
     }
 
     execPost(options = {}) {

@@ -68,42 +68,52 @@ export class BaseModel extends Model {
     }
 
     setFromResponse(res, included = []) {
-        if (res) {
-            super.setFromResponse(res)
-                .then((lastRes) => {
-                    if (included && included.length) {
-                        return this.setIncludedFromResponse(included)
-                            .then(() => lastRes);
-                    }
-                    return lastRes;
-                })
-                .then((lastRes) =>
-                    this.trigger('synced')
-                        .then(() => lastRes)
-                );
+        if (!res) {
+            return super.setFromResponse(res);
         }
-        return super.setFromResponse(res);
+        return this.setIncludedFromResponse(res, included)
+            .then(() => super.setFromResponse(res))
+            .then((lastRes) =>
+                this.trigger('synced')
+                    .then(() => lastRes)
+            );
     }
 
-    setIncludedFromResponse(included = []) {
-        let promises = [];
-        let relationships = this.getRelationships() || {};
-        for (let relationName in relationships) {
-            let relationship = relationships[relationName];
-            if (relationship instanceof RelationshipsCollection) {
-                relationship.forEach((relModel) => {
-                    let objData = included.find((entry) =>
-                        entry.id === relModel.id && entry.type === relModel.type
-                    );
-                    if (objData) {
-                        promises.push(
-                            relModel.setFromResponse(clone(objData))
-                        );
-                    }
-                });
-            }
+    setIncludedFromResponse(response, included = []) {
+        if (!response.relationships) {
+            return Promise.resolve();
         }
-        return Promise.all(promises);
+        return Promise.all(
+            Object.keys(response.relationships)
+                .map((relationName) =>
+                    this.setupRelationship(relationName)
+                        .then((collection) => {
+                            let relation = response.relationships[relationName];
+
+                            if (!relation.data) {
+                                return collection;
+                            }
+                            let setRelationDataPromise = Promise.resolve();
+                            relation.data.forEach((relation) => {
+                                let relatedData = included.find((includedData) => includedData.id === relation.id && includedData.type === relation.type);
+                                if (!relatedData) {
+                                    return;
+                                }
+                                setRelationDataPromise = setRelationDataPromise
+                                    .then(() => this.factory('model').initModel(relatedData.type))
+                                    .then((relatedModel) =>
+                                        relatedModel.setFromResponse(relatedData, included)
+                                            .then(() => {
+                                                collection.add(relatedModel);
+                                            })
+                                    )
+                            });
+                            return setRelationDataPromise;
+                        })
+                )
+        ).then(() => {
+            delete response.relationships;
+        });
     }
 
     getRelationships() {
@@ -163,39 +173,41 @@ export class BaseModel extends Model {
         });
     }
 
+    setupRelationship(relationName) {
+        let collections = this.getRelationships() || {};
+        if (collections.hasOwnProperty(relationName)) {
+            return Promise.resolve(collections[relationName]);
+        }
+        return this.initClass(RelationshipsCollection, relationName, this)
+            .then((collection) => {
+                collections[relationName] = collection;
+                this.setRelationships(collections);
+                return collection;
+            });
+    }
+
     setupRelationships() {
         let relationships = this.constructor.relationships || {};
-        let collections = this.getRelationships() || {};
         return Promise.all(
-            Object.keys(relationships).map((name) => {
-                let rel = relationships[name];
-                let relPromise = Promise.resolve(collections[name]);
-                if (!collections.hasOwnProperty(name)) {
-                    relPromise = this.initClass(RelationshipsCollection, name, this)
-                        .then((collection) => {
-                            collections[name] = collection;
-                            return Promise.resolve(collection);
-                        });
-                }
-                return relPromise.then((collection) => {
-                    if (Array.isArray(rel.data)) {
-                        collection.fetched = true;
-                        return Promise.all(
-                            rel.data.map((modelData) =>
-                                collection.model(modelData)
-                                    .then((model) =>
-                                        this.addRelationship(name, model)
-                                    )
-                            )
-                        );
-                    }
-                    return Promise.resolve();
-                });
+            Object.keys(relationships).map((relationName) => {
+                let rel = relationships[relationName];
+                return this.setupRelationship(relationName)
+                    .then((collection) => {
+                        if (Array.isArray(rel.data)) {
+                            collection.fetched = true;
+                            return Promise.all(
+                                rel.data.map((modelData) =>
+                                    collection.model(modelData)
+                                        .then((model) =>
+                                            this.addRelationship(relationName, model)
+                                        )
+                                )
+                            );
+                        }
+                        return Promise.resolve();
+                    });
             })
-        ).then(() => {
-            this.setRelationships(collections);
-            return Promise.resolve();
-        });
+        );
     }
 
     getRelationship(name) {
