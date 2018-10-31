@@ -1,3 +1,4 @@
+import { clone } from '@chialab/proteins';
 import { AjaxModel } from '@chialab/synapse/src/models/ajax.js';
 import { internal } from '@chialab/synapse/src/helpers/internal';
 import tv4 from 'tv4';
@@ -123,6 +124,7 @@ export class Model extends AjaxModel {
         if (!response) {
             return super.setFromResponse(response);
         }
+        response = clone(response);
         if (response.id) {
             this.set({
                 id: response.id,
