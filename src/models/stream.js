@@ -1,8 +1,8 @@
-import { BaseModel } from './base.js';
+import { Model } from '../model.js';
 import { RELATIONSHIP_MODES } from '../collections/relationships.js';
 import SCHEMA from '../schemas/objects/streams.json';
 
-export class StreamModel extends BaseModel {
+export class StreamModel extends Model {
     static get schema() {
         return SCHEMA;
     }

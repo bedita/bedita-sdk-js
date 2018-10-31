@@ -3,6 +3,7 @@ import { Collection } from '../collection.js';
 import { ObjectTypesCollection } from '../collections/object_types.js';
 import { PropertyTypesCollection } from '../collections/property_types.js';
 import { PropertiesCollection } from '../collections/properties.js';
+import { RelationshipsCollection } from '../collections/relationships.js';
 
 /**
  * Handle models via API.
@@ -262,6 +263,16 @@ export class ModelFactory extends Factory {
                 }
                 return collection;
             });
+    }
+
+    /**
+     * Create a relations collection for a model.
+     * @param {Model} left The left model.
+     * @param {string} relationName The name of the relation.
+     * @return {Promise<RelationshipsCollection>}
+     */
+    initRelationshipsCollection(left, relationName) {
+        return this.initClass(RelationshipsCollection, left, relationName);
     }
 
     /**

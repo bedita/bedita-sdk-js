@@ -25,7 +25,7 @@ export class RelationshipsCollection extends Collection {
         return this.def.mode || RELATIONSHIP_MODES.ONE_TO_MANY;
     }
 
-    initialize(name, left) {
+    initialize(left, name) {
         this.name = name;
         this.parent = left;
         this.fetched = false;

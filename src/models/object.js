@@ -1,7 +1,7 @@
-import { BaseModel } from './base.js';
+import { Model } from '../model.js';
 import SCHEMA from '../schemas/objects/objects.json';
 
-export class ObjectModel extends BaseModel {
+export class ObjectModel extends Model {
     static get schema() {
         return SCHEMA;
     }

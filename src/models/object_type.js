@@ -1,10 +1,10 @@
-import { BaseModel } from './base.js';
+import { Model } from '../model.js';
 import SCHEMA from '../schemas/model/object_type.json';
 
 /**
  * Object type model
  */
-export class ObjectTypeModel extends BaseModel {
+export class ObjectTypeModel extends Model {
 
     /**
      * Return model schema
