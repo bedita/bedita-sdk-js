@@ -8,7 +8,7 @@ export class UserModel extends ObjectModel {
         };
     }
 
-    static get relationships() {
+    static get relations() {
         return {
             roles: {
                 types: ['roles'],

@@ -27,7 +27,7 @@ export class Model extends AjaxModel {
         };
         return class extends Ctr {
             static get schema() { return schema; }
-            static get relationships() { return relations; }
+            static get relations() { return relations; }
             get type() { return type; }
         };
     }
@@ -250,14 +250,14 @@ export class Model extends AjaxModel {
     fetchRelationships(options = {}) {
         let collections = this.getRelationships();
         let available = Object.keys(collections);
-        let filterRelationships = options.relationships;
-        if (filterRelationships === true) {
-            filterRelationships = available;
+        let filterRelations = options.relations;
+        if (filterRelations === true) {
+            filterRelations = available;
         }
         let promise = Promise.resolve();
         available
             .filter((name) => {
-                if (filterRelationships && filterRelationships.indexOf(name) === -1) {
+                if (filterRelations && filterRelations.indexOf(name) === -1) {
                     return false;
                 }
                 return true;
@@ -313,10 +313,11 @@ export class Model extends AjaxModel {
     }
 
     setupRelationships() {
-        let relationships = this.constructor.relationships || {};
+        const relations = this.constructor.relations || {};
+
         return Promise.all(
-            Object.keys(relationships).map((relationName) => {
-                let rel = relationships[relationName];
+            Object.keys(relations).map((relationName) => {
+                let rel = relations[relationName];
                 return this.setupRelationship(relationName)
                     .then((collection) => {
                         if (Array.isArray(rel.data)) {

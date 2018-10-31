@@ -9,8 +9,9 @@ export const RELATIONSHIP_MODES = {
 export class RelationshipsCollection extends Collection {
     get def() {
         let parent = this.parent;
-        let rels = parent.constructor.relationships || {};
-        return rels.hasOwnProperty(this.name) ? rels[this.name] : {};
+        let relations = parent.constructor.relations || {};
+
+        return relations.hasOwnProperty(this.name) ? relations[this.name] : {};
     }
 
     get inverse() {

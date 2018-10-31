@@ -140,7 +140,8 @@ export class Collection extends AjaxCollection {
 
     post(model, options = {}) {
         const modelOptions = clone(options);
-        const relationshipsOptions = clone(options);
+        const relationsOptions = clone(options);
+
         let api = modelOptions.endpoint;
         if (!api) {
             let id = model.get('id');
@@ -160,7 +161,7 @@ export class Collection extends AjaxCollection {
         }
         return super.post(model, modelOptions)
             .then(() =>
-                model.postRelationships(relationshipsOptions)
+                model.postRelationships(relationsOptions)
             ).then(() => {
                 model.resetChanges();
                 return Promise.resolve(model);
@@ -197,8 +198,8 @@ export class Collection extends AjaxCollection {
             queryParams.q = options.search;
         }
         let include = [];
-        if (Entity.relationships) {
-            let rels = Entity.relationships;
+        if (Entity.relations) {
+            let rels = Entity.relations;
             for (let k in rels) {
                 if (rels[k].include) {
                     include.push(k);

@@ -7,7 +7,7 @@ export class MediaModel extends ObjectModel {
         return SCHEMA;
     }
 
-    static get relationships() {
+    static get relations() {
         return {
             streams: {
                 types: ['streams'],

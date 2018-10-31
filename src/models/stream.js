@@ -7,7 +7,7 @@ export class StreamModel extends Model {
         return SCHEMA;
     }
 
-    static get relationships() {
+    static get relations() {
         return {
             object: {
                 types: ['media'],
