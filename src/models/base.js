@@ -341,4 +341,19 @@ export class BaseModel extends Model {
             this.setRelationshipMeta(relName, relModel, relMeta, true);
         }
     }
+
+    /**
+     * Validate local data for the model.
+     * @param {Object} data The data to validate.
+     * @param {Object} options A set of options for the validation.
+     * @return {boolean}
+     */
+    validate(data, options) {
+        if (this.factory('model').autoValidation) {
+            return {
+                valid: true,
+            };
+        }
+        return super.validate(data, options);
+    }
 }

@@ -28,6 +28,7 @@ export class ModelFactory extends Factory {
      * @return {Promise}
      */
     initialize(options = {}) {
+        this.autoValidation = true;
         this.models = {};
         this.collections = {};
         this.modelQueue = {};
@@ -261,5 +262,19 @@ export class ModelFactory extends Factory {
                 }
                 return collection;
             });
+    }
+
+    /**
+     * Enable models auto validation on set.
+     */
+    enableAutoValidation() {
+        this.autoValidation = true;
+    }
+
+    /**
+     * Disable models auto validation on set.
+     */
+    disableAutoValidation() {
+        this.autoValidation = false;
     }
 }
