@@ -38,10 +38,11 @@ export class Model extends AjaxModel {
      */
     initialize(...args) {
         return super.initialize(...args)
-            .then(() =>
+            .then(() => {
+                this.setRelationships({});
                 // setup object relationships collections.
-                this.setupRelationships()
-            );
+                return this.setupRelationships();
+            });
     }
 
     isNew() {
@@ -79,7 +80,7 @@ export class Model extends AjaxModel {
      */
     reset(skipChanges) {
         // reset relationships collections
-        let rels = this.getRelationships() || {};
+        let rels = this.getRelationships();
         Object.keys(rels).forEach((name) => {
             rels[name].reset(skipChanges);
         });
@@ -99,9 +100,12 @@ export class Model extends AjaxModel {
 
     merge(model) {
         this.set(model.toJSON(true));
-        let relationships = model.getRelationships() || {};
+        let relationships = model.getRelationships();
         Object.keys(relationships).forEach((relationName) => {
             let collection = this.getRelationship(relationName);
+            if (!collection) {
+                return;
+            }
             let parentCollection = model.getRelationship(relationName);
             collection.reset();
             parentCollection.forEach((relatedModel) => {
@@ -300,7 +304,7 @@ export class Model extends AjaxModel {
 
     setupRelationship(relationName) {
         const modelFactory = this.factory('model');
-        const collections = this.getRelationships() || {};
+        const collections = this.getRelationships();
 
         if (collections.hasOwnProperty(relationName)) {
             return Promise.resolve(collections[relationName]);
