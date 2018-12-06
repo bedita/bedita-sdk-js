@@ -101,23 +101,23 @@ export class Model extends AjaxModel {
     merge(model) {
         this.set(model.toJSON(true));
         let relationships = model.getRelationships();
-        Object.keys(relationships).forEach((relationName) => {
-            let collection = this.getRelationship(relationName);
-            if (!collection) {
-                return;
-            }
-            let parentCollection = model.getRelationship(relationName);
-            collection.reset();
-            parentCollection.forEach((relatedModel) => {
-                this.addRelationship(
-                    relationName,
-                    relatedModel,
-                    model.getRelationshipMeta(relationName, relatedModel)
-                );
-            });
-            collection.resetChanges();
-        });
-        return this;
+        let promises = Object.keys(relationships).map((relationName) =>
+            this.setupRelationship(relationName)
+                .then((collection) => {
+                    collection.reset();
+                    let parentCollection = model.getRelationship(relationName);
+                    parentCollection.forEach((relatedModel) => {
+                        this.addRelationship(
+                            relationName,
+                            relatedModel,
+                            model.getRelationshipMeta(relationName, relatedModel)
+                        );
+                    });
+                    collection.resetChanges();
+                })
+        );
+        return Promise.all(promises)
+            .then(() => this);
     }
 
     get metadata() {
