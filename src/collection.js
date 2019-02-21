@@ -73,21 +73,59 @@ export class Collection extends AjaxCollection {
 
     fetch(model, options = {}) {
         options = clone(options);
-        let api = options.endpoint;
+        let endpoint = options.endpoint;
         let id = model.get('id');
         let Entity = options.Model || this.constructor.Model;
-        if (!api && id) {
-            api = `${this.defaultEndpoint || Entity.prototype.type || Entity.type}/${id}`;
+        if (!endpoint && id) {
+            endpoint = `${this.defaultEndpoint || Entity.prototype.type || Entity.type}/${id}`;
         }
-        if (!api) {
+        if (!endpoint) {
             return Promise.reject();
         }
-        options.endpoint = api;
+        const url = this.factory('url');
+        let queryParams = {};
+        let include = [];
+        if (Entity.relations) {
+            let rels = Entity.relations;
+            for (let k in rels) {
+                if (rels[k].include) {
+                    include.push(k);
+                }
+            }
+        }
+        if (options.include) {
+            options.include.forEach((rel) => {
+                if (include.indexOf(rel) === -1) {
+                    include.push(rel);
+                }
+            });
+        }
+        if (include.length) {
+            queryParams.include = include.join(',');
+        }
+
+        // check if field filter is set, search if fields are valid
+        // for model schema and add them to queryParams
+        let fields = [];
+        if (Entity.schema && Entity.schema.properties && options.fields) {
+            let modelFields = Entity.schema.properties;
+            for (let fieldName in modelFields) {
+                if (options.fields.indexOf(fieldName) > -1) {
+                    fields.push(fieldName);
+                }
+            }
+            if (fields.length) {
+                queryParams.fields = fields.join(',');
+            }
+        }
+
+        options.endpoint = url.setSearchParams(endpoint, queryParams);
+        let included = [];
         return this.beforeFetch(options)
             .then((options) =>
                 this.execFetch(options)
                     .then((res) =>
-                        this.afterFetch(res)
+                        this.afterFetch(res, included)
                     )
                     .then((data) =>
                         this.factory('model').getModel(data.type, this.constructor.Model)
@@ -100,7 +138,7 @@ export class Collection extends AjaxCollection {
                             })
                             .then((convertedModel) => {
                                 convertedModel.resetChanges();
-                                return convertedModel.setFromResponse(data);
+                                return convertedModel.setFromResponse(data, included);
                             })
                             .catch((err) => {
                                 this.factory('debug').error('model convertion ->', err);
@@ -109,11 +147,13 @@ export class Collection extends AjaxCollection {
             );
     }
 
-    afterFetch(res) {
+    afterFetch(res, included = this.included) {
         if (res && res.meta && res.meta.pagination) {
             this.pagination = res.meta.pagination;
         }
-        this.included = res.included || [];
+        if (res && res.included && included) {
+            included.push(...res.included);
+        }
         return Promise.resolve(res && res.data);
     }
 
@@ -236,6 +276,7 @@ export class Collection extends AjaxCollection {
         this.endpoint = options.endpoint = endpoint;
         internal(this).lastOptions = options;
 
+        this.included = [];
         let promise = super.findAll(options);
         if (options.full) {
             // Load all results by fetching all pages one after the other.
