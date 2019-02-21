@@ -55,9 +55,9 @@ export class Session extends Factory {
                             model.setFromResponse(res.data, res.included)
                                 .then(() => {
                                     this.user = model;
-                                    this.trigger('login', this.user);
-                                    return Promise.resolve(model);
                                 })
+                                .then(() => this.trigger('login', model))
+                                .then(() => model)
                         )
                 );
         }
@@ -69,7 +69,7 @@ export class Session extends Factory {
         localStorage.removeItem('user.id');
         const apiFactory = this.factory('api');
         apiFactory.logout();
-        this.trigger('logout', ...args);
+        return this.trigger('logout', ...args);
     }
 
     renew() {
