@@ -20,4 +20,22 @@ export class MediaModel extends ObjectModel {
     get type() {
         return 'media';
     }
+
+    /**
+     * @inheritdoc
+     */
+    initialize(...args) {
+        return super.initialize(...args)
+            .then(() => this.setupRelationship('streams'));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    setFromResponse(response, included = []) {
+        return super.setFromResponse(response, included)
+            .then((result) =>
+                this.fetchRelationship('streams').then(() => result)
+            );
+    }
 }

@@ -212,11 +212,10 @@ export class RelationshipsCollection extends Collection {
         }
         if (changes.removed.length) {
             if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
-                let model = changes.removed[0];
-                subject = model.id;
+                let model = this.inverse ? changes.removed[0] : this.parent;
                 promise = promise.then(() =>
                     this.execPost({
-                        endpoint: `/${api}/${subject}/relationships/${relationship}`,
+                        endpoint: `/${model.type}/${model.id}/relationships/${relationship}`,
                         body: null,
                         method: 'PATCH',
                     })
@@ -241,17 +240,17 @@ export class RelationshipsCollection extends Collection {
         }
         if (changes.added.length) {
             if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
-                let model = changes.added[0];
-                subject = model.id;
+                let parent = this.inverse ? this.parent : changes.added[0];
+                let model = this.inverse ? changes.added[0] : this.parent;
                 promise = promise.then(() =>
                     this.execPost({
-                        endpoint: `/${api}/${subject}/relationships/${relationship}`,
+                        endpoint: `/${model.type}/${model.id}/relationships/${relationship}`,
                         body: {
                             data: {
-                                id: this.parent.id,
-                                type: this.parent.type,
+                                id: parent.id,
+                                type: parent.type,
                                 meta: {
-                                    relation: this.parent.getRelationshipMeta(this.name, model),
+                                    relation: parent.getRelationshipMeta(this.name, model),
                                 },
                             },
                         },
@@ -280,17 +279,17 @@ export class RelationshipsCollection extends Collection {
         }
         if (changes.changed.length) {
             if (this.mode === RELATIONSHIP_MODES.ONE_TO_ONE) {
-                let model = changes.changed[0];
-                subject = model.id;
+                let parent = this.inverse ? this.parent : changes.changed[0];
+                let model = this.inverse ? changes.changed[0] : this.parent;
                 promise = promise.then(() =>
                     this.execPost({
-                        endpoint: `/${api}/${subject}/relationships/${relationship}`,
+                        endpoint: `/${model.type}/${model.id}/relationships/${relationship}`,
                         body: {
                             data: {
-                                id: this.parent.id,
-                                type: this.parent.type,
+                                id: parent.id,
+                                type: parent.type,
                                 meta: {
-                                    relation: this.parent.getRelationshipMeta(this.name, model),
+                                    relation: parent.getRelationshipMeta(this.name, model),
                                 },
                             },
                         },
@@ -315,8 +314,11 @@ export class RelationshipsCollection extends Collection {
             }
         }
         return promise.then(() => {
-            this.resetChanges();
-            return this.findAll();
+            if (this.mode !== RELATIONSHIP_MODES.ONE_TO_ONE) {
+                this.resetChanges();
+                return this.findAll();
+            }
+            return this;
         });
     }
 

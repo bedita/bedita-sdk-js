@@ -26,35 +26,31 @@ export class StreamsCollection extends Collection {
         }).then((res) =>
             this.model()
                 .then((model) =>
-                    model.setFromResponse(res.data)
-                        .then(() => Promise.resolve(model))
+                    model.setFromResponse(res.data).then(() => model)
                 )
                 .then((streamModel) => {
-                    if (media) {
-                        let mediaPromise = Promise.resolve(media);
-                        if (!(media instanceof MediaModel)) {
-                            return this.factory('model').getCollection(media.type)
-                                .catch(() => MediaCollection)
-                                .then((Collection) => this.initClass(Collection))
-                                .then((collection) =>
-                                    collection.model(media)
-                                        .then((model) =>
-                                            collection.post(model)
-                                                .then(() =>
-                                                    Promise.resolve(model)
-                                                )
-                                        )
-                                );
-                        }
-                        return mediaPromise.then((mediaModel) => {
-                            if (!mediaModel.name) {
-                                mediaModel.set('name', name, { validate: false });
-                            }
-                            mediaModel.addRelationship('streams', streamModel);
-                            return Promise.resolve(streamModel);
-                        });
+                    if (!media) {
+                        return streamModel;
                     }
-                    return Promise.resolve(streamModel);
+                    return this.factory('model').getCollection(media.type)
+                        .catch(() => MediaCollection)
+                        .then((Collection) => this.initClass(Collection))
+                        .then((collection) => {
+                            let mediaPromise = Promise.resolve(media);
+                            if (!(media instanceof MediaModel)) {
+                                mediaPromise = collection.model(media);
+                            }
+                            return mediaPromise.then((mediaModel) => {
+                                streamModel.addRelationship('object', mediaModel);
+                                return streamModel.postRelationships()
+                                    .then(() => {
+                                        if (!mediaModel.name) {
+                                            mediaModel.set('name', name, { validate: false });
+                                        }
+                                        return collection.post(mediaModel).then(() => mediaModel);
+                                    });
+                            });
+                        });
                 })
         );
     }
