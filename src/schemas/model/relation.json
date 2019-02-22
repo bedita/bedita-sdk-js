@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "inverse_name": {
+      "type": "string"
+    },
+    "inverse_label": {
+      "type": "string"
+    },
+    "description": {
+      "oneOf": [{
+          "type": "null"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "required": ["name", "label", "inverse_name", "inverse_label"]
+}
