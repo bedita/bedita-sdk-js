@@ -339,6 +339,6 @@ export class RelationshipsCollection extends Collection {
 
     /** @inheritdoc */
     getCleanCopy() {
-        return this.initClass(this.constructor, this.name, this.parent);
+        return this.initClass(this.constructor, this.parent, this.name);
     }
 }
