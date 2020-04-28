@@ -1,4 +1,4 @@
-import { Factory } from '@chialab/synapse/src/factory.js';
+import { Factory } from '@chialab/synapse';
 import { Collection } from '../collection.js';
 import { ObjectTypesCollection } from '../collections/object_types.js';
 import { PropertyTypesCollection } from '../collections/property_types.js';

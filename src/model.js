@@ -1,6 +1,5 @@
 import { clone } from '@chialab/proteins';
-import { AjaxModel } from '@chialab/synapse/src/models/ajax.js';
-import { internal } from '@chialab/synapse/src/helpers/internal';
+import { AjaxModel, internal } from '@chialab/synapse';
 import tv4 from 'tv4';
 
 tv4.addFormat('date-time', (data) => {

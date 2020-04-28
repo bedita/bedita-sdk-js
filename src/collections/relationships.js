@@ -1,4 +1,4 @@
-import clone from '@chialab/proteins/src/clone.js';
+import { clone } from '@chialab/proteins';
 import { Collection } from '../collection.js';
 
 export const RELATIONSHIP_MODES = {

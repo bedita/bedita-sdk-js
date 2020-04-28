@@ -1,5 +1,5 @@
-import { Factory } from '@chialab/synapse/src/factory.js';
-import * as keypath from '@chialab/proteins/src/keypath.js';
+import { keypath } from '@chialab/proteins';
+import { Factory } from '@chialab/synapse';
 
 export class Url extends Factory {
     chunk(key, val) {

@@ -2,7 +2,8 @@
   "name": "bedita-sdk-js",
   "version": "4.0.0-alpha.35",
   "description": "BEdita SDK for JavaScript.",
-  "main": "src/index.js",
+  "main": "dist/bedita-sdk.js",
+  "module": "src/index.js",
   "scripts": {
     "lint": "eslint src/",
     "build": "eslint src/ && rollup -c",

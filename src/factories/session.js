@@ -1,5 +1,4 @@
-import { internal } from '@chialab/synapse/src/helpers/internal.js';
-import { Factory } from '@chialab/synapse/src/factory.js';
+import { Factory, internal } from '@chialab/synapse';
 
 export class Session extends Factory {
     getUser() {

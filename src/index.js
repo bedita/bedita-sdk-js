@@ -1,7 +1,4 @@
-import { mix } from '@chialab/synapse/src/helpers/mixin.js';
-import { internal } from '@chialab/synapse/src/helpers/internal.js';
-import { Factory } from '@chialab/synapse/src/factory.js';
-import { InjectableMixin } from '@chialab/synapse/src/mixins/injectable.js';
+import { Factory, InjectableMixin, mix, internal } from '@chialab/synapse';
 
 // MODELS
 export * from './model.js';
