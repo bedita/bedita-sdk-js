@@ -1,6 +1,6 @@
 {
   "name": "bedita-sdk-js",
-  "version": "4.0.0-alpha.35",
+  "version": "4.0.0-alpha.36",
   "description": "BEdita SDK for JavaScript.",
   "main": "dist/bedita-sdk.js",
   "module": "src/index.js",
